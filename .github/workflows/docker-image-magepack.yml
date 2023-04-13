@@ -1,0 +1,47 @@
+name: Docker Image Magepack
+on:
+  schedule:
+    - cron: "0 3 * * 0" # At 03:00 on Sunday
+  push:
+    paths:
+      - images/version
+      - images/magepack/**
+      - .github/workflows/*magepack*
+
+jobs:
+  magepack:
+    name: Magepack
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ${{ vars.MAGEPACK_VERSIONS }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        with:
+          context: images/magepack
+          platforms: linux/amd64,linux/arm64
+          build-args: MAGEPACK_VERSION=${{ matrix.version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/magepack:${{ matrix.version }}
