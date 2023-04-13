@@ -3,8 +3,10 @@ on:
   schedule:
     - cron: "0 3 * * 0" # At 03:00 on Sunday
   push:
+    branches:
+      - 'main'
     paths:
-      - images/version
+      - version
       - images/dnsmasq/**
       - .github/workflows/*dnsmasq*
 

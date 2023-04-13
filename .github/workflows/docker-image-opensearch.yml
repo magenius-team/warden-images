@@ -3,20 +3,31 @@ on:
   schedule:
     - cron: "0 3 * * 0" # At 03:00 on Sunday
   push:
+    branches:
+      - 'main'
     paths:
-      - images/version
+      - version
       - images/opensearch/**
       - .github/workflows/*opensearch*
 
 jobs:
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo "matrix=${{ vars.OPENSEARCH_MATRIX }}" >> $GITHUB_OUTPUT
+      - run: echo "Matrix:\n";echo '${{ steps.set-matrix.outputs.matrix }}'
+
   opensearch:
+    needs: build-matrix
     name: OpenSearch
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
-      matrix:
-        version: ${{ vars.OPENSEARCH_VERSIONS }}
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
 
     steps:
       - uses: actions/checkout@v3

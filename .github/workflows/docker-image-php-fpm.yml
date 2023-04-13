@@ -3,14 +3,13 @@ on:
   schedule:
     - cron: "0 3 * * 0"   # At 03:00 on Sunday
   push:
+    branches:
+      - 'main'
     paths:
-      - images/version
+      - version
       - images/php-fpm/**
       - .github/workflows/*php-fpm*
       - .github/workflows/php-matrix/**
-    branches:
-      - main
-      - test-php-fpm
 jobs:
   php-matrix:
     name: Generate Base PHP Matrix
