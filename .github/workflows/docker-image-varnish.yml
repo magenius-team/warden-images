@@ -24,11 +24,9 @@ jobs:
     needs: build-matrix
     name: Varnish
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
-
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v2
@@ -69,13 +67,11 @@ jobs:
   varnish-lts:
     name: Varnish LTS
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         version:
           - "6.0"
-
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v2

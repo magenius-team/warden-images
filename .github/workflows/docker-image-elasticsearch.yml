@@ -24,7 +24,6 @@ jobs:
     needs: build-matrix
     name: Elasticsearch
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
