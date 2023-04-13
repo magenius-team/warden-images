@@ -25,6 +25,7 @@ jobs:
         run: |
           php .github/workflows/php-matrix/php-generator.php >> $GITHUB_OUTPUT
       - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
+
   node-matrix:
     name: Generate Base PHP-Node Matrix
     runs-on: ubuntu-latest
@@ -39,6 +40,7 @@ jobs:
         run: |
           php .github/workflows/php-matrix/node-generator.php >> $GITHUB_OUTPUT
       - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
+
   blackfire-matrix:
     name: Generate PHP-Node + Blackfire Matrix
     runs-on: ubuntu-latest
@@ -53,6 +55,7 @@ jobs:
         run: |
           php .github/workflows/php-matrix/blackfire-generator.php >> $GITHUB_OUTPUT
       - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
+
   full-matrix:
     name: Generate Full Matrix
     runs-on: ubuntu-latest
@@ -67,6 +70,7 @@ jobs:
         run: |
           php .github/workflows/php-matrix/full-generator.php >> $GITHUB_OUTPUT
       - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
+
   php-fpm:
     needs: php-matrix
     name: PHP-FPM ${{ matrix.php_version }}
@@ -135,6 +139,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-buildcache,mode=max
+
   php-node:
     name: PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -201,6 +206,7 @@ jobs:
             NODE_VERSION=${{ matrix.node_version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest
+
   xdebug:
     name: PHP-FPM ${{ matrix.php_version }} + XDebug - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -280,6 +286,7 @@ jobs:
             XDEBUG_TYPE=${{ matrix.xdebug_type }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-debug:latest
+
   blackfire:
     name: PHP-FPM ${{ matrix.php_version }} + Blackfire - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -355,6 +362,7 @@ jobs:
             PHP_VERSION=${{ matrix.php_version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-blackfire:latest
+
   magento1:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -430,6 +438,7 @@ jobs:
             PHP_VERSION=${{ matrix.php_version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-magento1:latest
+
   magento1-xdebug:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -509,6 +518,7 @@ jobs:
             XDEBUG_TYPE=${{ matrix.xdebug_type }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-magento1-debug:latest
+
   magento1-blackfire:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -584,6 +594,7 @@ jobs:
             PHP_VERSION=${{ matrix.php_version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-magento1-blackfire:latest
+
   magento2:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -659,6 +670,7 @@ jobs:
             PHP_VERSION=${{ matrix.php_version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-magento2:latest
+
   magento2-xdebug:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + XDebug - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
@@ -738,6 +750,7 @@ jobs:
             XDEBUG_TYPE=${{ matrix.xdebug_type }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm-magento2-debug:latest
+
   magento2-blackfire:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Blackfire - Node ${{ matrix.node_version }}
     runs-on: ubuntu-latest
