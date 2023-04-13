@@ -99,21 +99,6 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        id: build
-        with:
-          file: images/php-fpm/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64
-          build-args: |
-            PHP_VERSION=${{ matrix.php_version }}
-            ENV_SOURCE_IMAGE=php
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-buildcache
-          load: true
-          tags: den/test-image:latest
-
-      - run: docker run den/test-image:latest php -v
-
-      - uses: docker/build-push-action@v3
         with:
           file: images/php-fpm/Dockerfile
           context: images/php-fpm/context
@@ -167,21 +152,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
-
-      - uses: docker/build-push-action@v3
-        id: build
-        with:
-          file: images/php-fpm/node/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}
-            NODE_VERSION=${{ matrix.node_version }}
-          load: true
-          tags: den/test-image:latest
-
-      - run: docker run den/test-image:latest node -v
 
       - uses: docker/build-push-action@v3
         with:
