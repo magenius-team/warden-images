@@ -36,7 +36,8 @@ RUN chmod +x /usr/local/bin/install-php-extensions && install-php-extensions \
     sockets \
     sodium \
     xsl \
-    zip
+    zip \
+    ssh2
 
 # Install helpful utilities
 RUN apk --no-cache add \
