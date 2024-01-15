@@ -178,7 +178,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest
 
   xdebug3:
-    name: PHP-FPM ${{ matrix.php_version }} + XDebug 3 +- Node ${{ matrix.node_version }}
+    name: PHP-FPM ${{ matrix.php_version }} + XDebug 3
     runs-on: ubuntu-latest
     needs: [ php-node, full-matrix ]
     continue-on-error: ${{ matrix.experimental }}
@@ -206,20 +206,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/xdebug3/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-            XDEBUG_TYPE=${{ matrix.xdebug_type }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-xdebug3
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
           context: images/php-fpm/context
@@ -232,20 +219,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-xdebug3
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/xdebug3/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-            XDEBUG_TYPE=${{ matrix.xdebug_type }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-xdebug3
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
           context: images/php-fpm/context
@@ -257,8 +231,62 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-xdebug3
 
+  xdebug3-node:
+    name: PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ php-node, full-matrix ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/xdebug3/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+            XDEBUG_TYPE=${{ matrix.xdebug_type }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-xdebug3
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/xdebug3/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+            XDEBUG_TYPE=${{ matrix.xdebug_type }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-xdebug3
+
   blackfire:
-    name: PHP-FPM ${{ matrix.php_version }} + Blackfire +- Node ${{ matrix.node_version }}
+    name: PHP-FPM ${{ matrix.php_version }} + Blackfire
     runs-on: ubuntu-latest
     needs: [ php-node, blackfire-matrix ]
     continue-on-error: ${{ matrix.experimental }}
@@ -286,19 +314,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/blackfire/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-blackfire
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
           context: images/php-fpm/context
@@ -310,19 +326,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-blackfire
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/blackfire/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-blackfire
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
           context: images/php-fpm/context
@@ -333,8 +337,60 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-blackfire
 
+  blackfire-node:
+    name: PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ php-node, blackfire-matrix ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/blackfire/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-blackfire
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/blackfire/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-blackfire
+
   magento1:
-    name: Magento 1 PHP-FPM ${{ matrix.php_version }} +- Node ${{ matrix.node_version }}
+    name: Magento 1 PHP-FPM ${{ matrix.php_version }}
     runs-on: ubuntu-latest
     needs: [ full-matrix, php-node ]
     continue-on-error: ${{ matrix.experimental }}
@@ -362,19 +418,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/magento1/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento1/Dockerfile
           context: images/php-fpm/context
@@ -386,19 +430,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/magento1/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento1
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/Dockerfile
           context: images/php-fpm/context
@@ -409,8 +441,60 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-magento1
 
+  magento1-node:
+    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ full-matrix, php-node ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/magento1/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/magento1/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento1
+
   magento1-xdebug3:
-    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3 +- Node ${{ matrix.node_version }}
+    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3
     runs-on: ubuntu-latest
     needs: [ full-matrix, magento1 ]
     continue-on-error: ${{ matrix.experimental }}
@@ -438,20 +522,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/magento1/xdebug3/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
-            XDEBUG_TYPE=${{ matrix.xdebug_type }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-xdebug3
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento1/xdebug3/Dockerfile
           context: images/php-fpm/context
@@ -464,20 +535,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1-xdebug3
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/magento1/xdebug3/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
-            XDEBUG_TYPE=${{ matrix.xdebug_type }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento1-xdebug3
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/xdebug3/Dockerfile
           context: images/php-fpm/context
@@ -489,8 +547,62 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-magento1-xdebug3
 
+  magento1-xdebug3-node:
+    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ full-matrix, magento1 ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/magento1/xdebug3/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
+            XDEBUG_TYPE=${{ matrix.xdebug_type }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-xdebug3
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/magento1/xdebug3/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
+            XDEBUG_TYPE=${{ matrix.xdebug_type }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento1-xdebug3
+
   magento1-blackfire:
-    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire +- Node ${{ matrix.node_version }}
+    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire
     runs-on: ubuntu-latest
     needs: [ blackfire-matrix, magento1 ]
     continue-on-error: ${{ matrix.experimental }}
@@ -518,19 +630,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/magento1/blackfire/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-blackfire
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento1/blackfire/Dockerfile
           context: images/php-fpm/context
@@ -542,19 +642,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1-blackfire
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/magento1/blackfire/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento1-blackfire
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/blackfire/Dockerfile
           context: images/php-fpm/context
@@ -565,8 +653,60 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-magento1-blackfire
 
+  magento1-blackfire-node:
+    name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ blackfire-matrix, magento1 ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/magento1/blackfire/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-blackfire
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/magento1/blackfire/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento1-blackfire
+
   magento2:
-    name: Magento 2 PHP-FPM ${{ matrix.php_version }} +- Node ${{ matrix.node_version }}
+    name: Magento 2 PHP-FPM ${{ matrix.php_version }}
     runs-on: ubuntu-latest
     needs: [ full-matrix, php-node ]
     continue-on-error: ${{ matrix.experimental }}
@@ -594,19 +734,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/magento2/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento2/Dockerfile
           context: images/php-fpm/context
@@ -618,19 +746,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/magento2/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento2
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento2/Dockerfile
           context: images/php-fpm/context
@@ -641,8 +757,60 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-magento2
 
+  magento2-node:
+    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ full-matrix, php-node ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/magento2/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/magento2/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento2
+
   magento2-xdebug3:
-    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + XDebug 3 +- Node ${{ matrix.node_version }}
+    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + XDebug 3
     runs-on: ubuntu-latest
     needs: [ full-matrix, magento2 ]
     continue-on-error: ${{ matrix.experimental }}
@@ -670,20 +838,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/magento2/xdebug3/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
-            XDEBUG_TYPE=${{ matrix.xdebug_type }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-xdebug3
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento2/xdebug3/Dockerfile
           context: images/php-fpm/context
@@ -696,20 +851,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2-xdebug3
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/magento2/xdebug3/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
-            XDEBUG_TYPE=${{ matrix.xdebug_type }}
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento2-xdebug3
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento2/xdebug3/Dockerfile
           context: images/php-fpm/context
@@ -721,8 +863,62 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-magento2-xdebug3
 
+  magento2-xdebug3-node:
+    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ full-matrix, magento2 ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/magento2/xdebug3/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
+            XDEBUG_TYPE=${{ matrix.xdebug_type }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-xdebug3
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/magento2/xdebug3/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
+            XDEBUG_TYPE=${{ matrix.xdebug_type }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento2-xdebug3
+
   magento2-blackfire:
-    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Blackfire +- Node ${{ matrix.node_version }}
+    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Blackfire
     runs-on: ubuntu-latest
     needs: [ blackfire-matrix, magento2 ]
     continue-on-error: ${{ matrix.experimental }}
@@ -750,19 +946,7 @@ jobs:
         if: ${{ !env.ACT }}
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' }}
-        with:
-          file: images/php-fpm/magento2/blackfire/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-blackfire
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' }}
+        if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento2/blackfire/Dockerfile
           context: images/php-fpm/context
@@ -774,19 +958,7 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2-blackfire
 
       - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version!='x' && matrix.latest }}
-        with:
-          file: images/php-fpm/magento2/blackfire/Dockerfile
-          context: images/php-fpm/context
-          platforms: linux/amd64,linux/arm64
-          build-args: |
-            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
-            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
-          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento2-blackfire
-
-      - uses: docker/build-push-action@v3
-        if: ${{ matrix.node_version=='x' && matrix.latest }}
+        if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento2/blackfire/Dockerfile
           context: images/php-fpm/context
@@ -796,3 +968,55 @@ jobs:
             PHP_VERSION=${{ matrix.php_version }}-magento2
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-magento2-blackfire
+
+  magento2-blackfire-node:
+    name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
+    runs-on: ubuntu-latest
+    needs: [ blackfire-matrix, magento2 ]
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
+      matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' }}
+        with:
+          file: images/php-fpm/magento2/blackfire/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-blackfire
+
+      - uses: docker/build-push-action@v3
+        if: ${{ matrix.node_version != 'x' && matrix.latest }}
+        with:
+          file: images/php-fpm/magento2/blackfire/Dockerfile
+          context: images/php-fpm/context
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
+            PHP_VERSION=${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/php-fpm:latest-nodelatest-magento2-blackfire
