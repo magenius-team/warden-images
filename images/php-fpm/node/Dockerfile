@@ -10,7 +10,7 @@ USER root
 
 # Copy Node to PHP
 RUN --mount=type=bind,from=node,target=/node cp -a /node/usr/lib /usr/lib
-RUN --mount=type=bind,from=node,target=/node cp -a /node/usr/local/share usr/local/lib
+RUN --mount=type=bind,from=node,target=/node cp -a /node/usr/local/share /usr/local/lib
 RUN --mount=type=bind,from=node,target=/node cp -a /node/usr/local/lib /usr/local/lib
 RUN --mount=type=bind,from=node,target=/node cp -a /node/usr/local/include /usr/local/include
 RUN --mount=type=bind,from=node,target=/node cp -a /node/usr/local/bin /usr/local/bin
