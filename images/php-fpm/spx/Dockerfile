@@ -9,8 +9,8 @@ RUN apk --no-cache add g++ \
 
 RUN cd /tmp \
     && git clone https://github.com/NoiseByNorthwest/php-spx.git \
-    && git checkout release/latest \
     && cd php-spx \
+    && git checkout release/latest \
     && phpize \
     && ./configure \
     && make \
