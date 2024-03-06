@@ -81,10 +81,10 @@ jobs:
       matrix: ${{ fromJson(needs.php-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -92,13 +92,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           file: images/php-fpm/Dockerfile
           context: images/php-fpm/context
@@ -111,7 +111,7 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-buildcache,mode=max
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.latest }}
         with:
           file: images/php-fpm/Dockerfile
@@ -136,10 +136,10 @@ jobs:
       matrix: ${{ fromJson(needs.node-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -147,13 +147,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         with:
           file: images/php-fpm/node/Dockerfile
           context: images/php-fpm/context
@@ -164,7 +164,7 @@ jobs:
             NODE_VERSION=${{ matrix.node_version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.latest }}
         with:
           file: images/php-fpm/node/Dockerfile
@@ -188,10 +188,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -199,13 +199,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -218,7 +218,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-xdebug3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -242,10 +242,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -253,13 +253,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -272,7 +272,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-xdebug3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -296,10 +296,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -307,13 +307,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -325,7 +325,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-spx
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -348,10 +348,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -359,13 +359,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -377,7 +377,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-spx
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -400,10 +400,10 @@ jobs:
       matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -411,13 +411,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -429,7 +429,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-blackfire
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -452,10 +452,10 @@ jobs:
       matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -463,13 +463,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -481,7 +481,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-blackfire
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -504,10 +504,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -515,13 +515,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento1/Dockerfile
@@ -533,7 +533,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/Dockerfile
@@ -556,10 +556,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -567,13 +567,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/magento1/Dockerfile
@@ -585,7 +585,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/Dockerfile
@@ -608,10 +608,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -619,13 +619,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -638,7 +638,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1-xdebug3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -662,10 +662,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -673,13 +673,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -692,7 +692,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-xdebug3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -716,10 +716,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -727,13 +727,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -745,7 +745,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1-spx
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -768,10 +768,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -779,13 +779,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -797,7 +797,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-spx
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -820,10 +820,10 @@ jobs:
       matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -831,13 +831,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -849,7 +849,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento1-blackfire
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/blackfire/Dockerfile
@@ -872,10 +872,10 @@ jobs:
       matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -883,13 +883,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -901,7 +901,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento1-blackfire
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento1/blackfire/Dockerfile
@@ -924,10 +924,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -935,13 +935,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento2/Dockerfile
@@ -953,7 +953,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento2/Dockerfile
@@ -976,10 +976,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -987,13 +987,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/magento2/Dockerfile
@@ -1005,7 +1005,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/magento2/Dockerfile
@@ -1028,10 +1028,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -1039,13 +1039,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -1058,7 +1058,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2-xdebug3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -1082,10 +1082,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -1093,13 +1093,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -1112,7 +1112,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-xdebug3
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -1136,10 +1136,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -1147,13 +1147,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -1165,7 +1165,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2-spx
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -1188,10 +1188,10 @@ jobs:
       matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -1199,13 +1199,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -1217,7 +1217,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-spx
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -1240,10 +1240,10 @@ jobs:
       matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -1251,13 +1251,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -1269,7 +1269,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-magento2-blackfire
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -1292,10 +1292,10 @@ jobs:
       matrix: ${{ fromJson(needs.blackfire-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v2
-      - uses: docker/setup-buildx-action@v2
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -1303,13 +1303,13 @@ jobs:
         if: ${{ !env.ACT }}
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -1321,7 +1321,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/php-fpm:${{ matrix.php_version }}-node${{ matrix.node_version }}-magento2-blackfire
 
-      - uses: docker/build-push-action@v3
+      - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
