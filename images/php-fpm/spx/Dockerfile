@@ -16,7 +16,7 @@ RUN cd /tmp \
     && make \
     && sudo make install
 
-ENV PHP_EXT_DIR=$(php-config --extension-dir)
+ENV PHP_EXT_DIR="$($(which php-config) --extension-dir)"
 FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
