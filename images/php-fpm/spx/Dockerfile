@@ -5,7 +5,8 @@ USER root
 
 RUN apk --no-cache add g++ \
     autoconf \
-    make
+    make \
+    zlib-dev
 
 RUN cd /tmp \
     && git clone https://github.com/NoiseByNorthwest/php-spx.git \
