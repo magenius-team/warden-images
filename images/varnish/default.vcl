@@ -56,7 +56,7 @@ sub vcl_recv {
     }
 
     # Do not handle requests going through SPX
-    if (req.http.Cookie ~ "XDEBUG_PROFILE=SPX" || req.http.Cookie ~ "SPX_ENABLED" || req.http.Cookie ~ "SPX_KEY" || req.url ~ "(?i)(\?|\&)SPX_UI_URI=" || req.url ~ "(?i)(\?|\&)SPX_KEY=") {
+    if (req.http.Cookie ~ "SPX_ENABLED" || req.http.Cookie ~ "SPX_KEY" || req.url ~ "(?i)(\?|\&)SPX_UI_URI=" || req.url ~ "(?i)(\?|\&)SPX_KEY=") {
         return (pass);
     }
 
