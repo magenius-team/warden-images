@@ -852,7 +852,7 @@ jobs:
       - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version == 'x' && matrix.latest }}
         with:
-          file: images/php-fpm/magento1/blackfire/Dockerfile
+          file: images/php-fpm/blackfire/Dockerfile
           context: images/php-fpm/context
           platforms: linux/amd64,linux/arm64
           build-args: |
@@ -904,7 +904,7 @@ jobs:
       - uses: docker/build-push-action@v5
         if: ${{ matrix.node_version != 'x' && matrix.latest }}
         with:
-          file: images/php-fpm/magento1/blackfire/Dockerfile
+          file: images/php-fpm/blackfire/Dockerfile
           context: images/php-fpm/context
           platforms: linux/amd64,linux/arm64
           build-args: |
