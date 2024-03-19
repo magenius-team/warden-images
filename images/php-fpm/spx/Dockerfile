@@ -17,13 +17,20 @@ RUN cd /tmp \
     && make \
     && sudo make install
 
-ENV PHP_EXT_DIR="$($(which php-config) --extension-dir)"
+RUN PHP_EXT_DIR="$($(which php-config) --extension-dir)" \
+    && ln -s "${PHP_EXT_DIR}" /tmp/php-ext-dir
+
 FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
-COPY --from=spx-builder ${PHP_EXT_DIR}/spx.so ${PHP_EXT_DIR}/spx.so
+RUN PHP_EXT_DIR="$($(which php-config) --extension-dir)" \
+    && ln -s "${PHP_EXT_DIR}" /tmp/php-ext-dir
+
+COPY --from=spx-builder /tmp/php-ext-dir/spx.so /tmp/php-ext-dir/spx.so
 COPY --from=spx-builder /usr/local/share/misc/php-spx/assets/web-ui /usr/local/share/misc/php-spx/assets/web-ui
 COPY spx/etc/php.d/* /usr/local/etc/php/conf.d/
+
+RUN rm /tmp/php-ext-dir
 
 ENV SPX_ENABLED=1
 USER www-data
