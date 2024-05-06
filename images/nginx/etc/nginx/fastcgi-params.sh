@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IFS=',' read -ra PARAMS <<< "$FASTCGI_PARAMS"
+IFS='||' read -ra PARAMS <<< "$FASTCGI_PARAMS"
 for i in "${PARAMS[@]}"; do
     KEY="${i%=*}"
     VALUE="${i#*=}"
