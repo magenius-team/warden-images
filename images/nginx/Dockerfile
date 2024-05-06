@@ -19,6 +19,9 @@ COPY etc/nginx/fastcgi_params /etc/nginx/fastcgi_params.template
 COPY etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.template
 COPY etc/nginx/available.d/*.conf /etc/nginx/available.d/
 
+COPY etc/nginx/fastcgi-params.sh /usr/local/bin/fastcgi-params.sh
+RUN chmod +x /usr/local/bin/fastcgi-params.sh
+
 CMD envsubst '${NGINX_UPSTREAM_HOST} ${NGINX_UPSTREAM_PORT} \
               ${NGINX_UPSTREAM_BLACKFIRE_HOST} ${NGINX_UPSTREAM_BLACKFIRE_PORT} \
               ${NGINX_UPSTREAM_DEBUG_HOST} ${NGINX_UPSTREAM_DEBUG_PORT} \
@@ -27,6 +30,7 @@ CMD envsubst '${NGINX_UPSTREAM_HOST} ${NGINX_UPSTREAM_PORT} \
         < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf \
     && envsubst '${XDEBUG_CONNECT_BACK_HOST}' \
         < /etc/nginx/fastcgi_params.template > /etc/nginx/fastcgi_params \
+    && ./usr/local/bin/fastcgi-params.sh \
     && nginx -g "daemon off;"
 
 WORKDIR /var/www/html
