@@ -30,7 +30,7 @@ CMD envsubst '${NGINX_UPSTREAM_HOST} ${NGINX_UPSTREAM_PORT} \
         < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf \
     && envsubst '${XDEBUG_CONNECT_BACK_HOST}' \
         < /etc/nginx/fastcgi_params.template > /etc/nginx/fastcgi_params \
-    && ./usr/local/bin/fastcgi-params.sh \
+    && /usr/local/bin/fastcgi-params.sh \
     && nginx -g "daemon off;"
 
 WORKDIR /var/www/html
