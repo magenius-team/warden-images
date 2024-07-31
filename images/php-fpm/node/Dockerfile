@@ -12,13 +12,13 @@ ARG NODE_VERSION
 FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
-# Conditional copy from libstdc if PHP_VERSION is 7.2
-RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
-        apk update \
-        && apk add --no-cache libstdc++ \
-        && rm /usr/lib/libstdc++.so.6 \
-        && ln -s /usr/lib/libstdc++.so.6.0.30 /usr/lib/libstdc++.so.6; \
-    fi
+RUN apk update \
+    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
+        if apk info -e $pkg; then apk del $pkg; fi; \
+    done \
+    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
+        if apk info -e $pkg; then apk add --update --no-cache $pkg; fi; \
+    done
 
 # Copy Node to PHP
 RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/lib/* /usr/lib && ls -la /usr/lib
@@ -30,13 +30,5 @@ RUN npm -v
 
 # Copy Yarn
 RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/opt/* /opt && ls -la /opt
-
-RUN apk update \
-    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
-        if apk info -e $pkg; then apk del $pkg; fi; \
-    done \
-    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
-        if apk info -e $pkg; then apk add --update --no-cache $pkg; fi; \
-    done
 
 USER www-data

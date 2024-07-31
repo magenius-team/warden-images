@@ -3,6 +3,7 @@
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'constants.php');
 
 $matrix = [];
+$nodeVersions = NODE_VERSIONS;
 
 foreach (PHP_VERSIONS as $phpVersion) {
     $xdebugType = !in_array($phpVersion, NOT_STABLE_XDEBUG_PHP_VERSIONS) ? 'xdebug-stable' : 'xdebug';
@@ -15,6 +16,9 @@ foreach (PHP_VERSIONS as $phpVersion) {
         'latest' => $phpVersion === PHP_LATEST,
     ];
     foreach (NODE_VERSIONS as $nodeVersion) {
+        if ($phpVersion === '7.2') {
+            $nodeVersions = ['12'];
+        }
         $matrix[] = [
             'php_version' => $phpVersion,
             'node_version' => $nodeVersion,
