@@ -3,7 +3,6 @@
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'constants.php');
 
 $matrix = [];
-$nodeVersions = NODE_VERSIONS;
 
 foreach (PHP_VERSIONS as $phpVersion) {
     $xdebugType = !in_array($phpVersion, NOT_STABLE_XDEBUG_PHP_VERSIONS) ? 'xdebug-stable' : 'xdebug';
@@ -15,10 +14,7 @@ foreach (PHP_VERSIONS as $phpVersion) {
         'experimental' => $experimental,
         'latest' => $phpVersion === PHP_LATEST,
     ];
-    if ($phpVersion === '7.2') {
-        $nodeVersions = ['12'];
-    }
-    foreach ($nodeVersions as $nodeVersion) {
+    foreach (NODE_VERSIONS as $nodeVersion) {
         $matrix[] = [
             'php_version' => $phpVersion,
             'node_version' => $nodeVersion,
@@ -30,4 +26,3 @@ foreach (PHP_VERSIONS as $phpVersion) {
 }
 
 echo 'matrix=' . json_encode(['include' => $matrix]);
-
