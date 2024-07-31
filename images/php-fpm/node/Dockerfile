@@ -2,7 +2,7 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 ARG NODE_VERSION
 
-FROM alpine:3.15 AS alpine
+FROM alpine:3.15 AS libstdc
 RUN apk update && apk add --no-cache libstdc++
 
 FROM node:${NODE_VERSION}-alpine AS node
@@ -17,7 +17,7 @@ USER root
 
 # Conditional copy from libstdc if PHP_VERSION is 7.2
 RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
-        --mount=type=bind,from=alpine,source=/,target=/libstdc cp -ra /libstdc/usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6.0.28 \
+        --mount=type=bind,from=libstdc,source=/,target=/libstdc cp -ra /libstdc/usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6.0.28 \
         && ls -la /usr/lib/ \
         && ln -s /usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6; \
     fi
