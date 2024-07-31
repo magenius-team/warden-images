@@ -20,7 +20,7 @@ RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/local/inc
 RUN --mount=type=bind,from=node,source=/,target=/node ls -la /node/usr/local/bin &&  cp -ra /node/usr/local/bin/* /usr/local/bin && ls -la /usr/local/bin
 
 # Copy Yarn
-RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/opt/* /opt
+RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/opt/* /opt && ls -la /opt
 RUN $(which npm) -v
 
 RUN apk update \
