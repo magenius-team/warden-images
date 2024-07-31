@@ -10,7 +10,7 @@ foreach (PHP_VERSIONS as $phpVersion) {
         $nodeVersions = ['12'];
     }
     $experimental = in_array($phpVersion, EXPERIMENTAL_PHP_VERSIONS);
-    foreach (NODE_VERSIONS as $nodeVersion) {
+    foreach ($nodeVersions as $nodeVersion) {
         $matrix[] = [
             'php_version' => $phpVersion,
             'node_version' => $nodeVersion,

@@ -15,10 +15,10 @@ foreach (PHP_VERSIONS as $phpVersion) {
         'experimental' => $experimental,
         'latest' => $phpVersion === PHP_LATEST,
     ];
-    foreach (NODE_VERSIONS as $nodeVersion) {
-        if ($phpVersion === '7.2') {
-            $nodeVersions = ['12'];
-        }
+    if ($phpVersion === '7.2') {
+        $nodeVersions = ['12'];
+    }
+    foreach ($nodeVersions as $nodeVersion) {
         $matrix[] = [
             'php_version' => $phpVersion,
             'node_version' => $nodeVersion,
@@ -30,3 +30,4 @@ foreach (PHP_VERSIONS as $phpVersion) {
 }
 
 echo 'matrix=' . json_encode(['include' => $matrix]);
+
