@@ -18,8 +18,10 @@ USER root
 # Conditional copy from libstdc if PHP_VERSION is 7.2
 RUN --mount=type=bind,from=libstdc,source=/,target=/libstdc \
     if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
-        cp -ra /libstdc/usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6.0.28 \
+        && ls -la /libstdc/usr/lib/ \
+        && cp -ra /libstdc/usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6.0.28 \
         && ls -la /usr/lib/ \
+        && rm /usr/lib/libstdc++.so.6 \
         && ln -s /usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6; \
     fi
 
