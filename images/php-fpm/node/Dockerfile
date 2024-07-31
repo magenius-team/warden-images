@@ -16,7 +16,7 @@ FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
 # Conditional copy from libstdc if PHP_VERSION is 7.2
-RUN if [ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]; then \
+RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
         --mount=type=bind,from=alpine,source=/,target=/libstdc cp -ra /libstdc/usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6.0.28 \
         && ls -la /usr/lib/ \
         && ln -s /usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6; \
