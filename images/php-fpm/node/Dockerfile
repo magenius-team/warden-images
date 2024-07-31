@@ -15,7 +15,7 @@ USER root
 # Conditional copy from libstdc if PHP_VERSION is 7.2
 RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
         apk update \
-        && apk add --no-chache libstdc++ \
+        && apk add --no-cache libstdc++ \
         && rm /usr/lib/libstdc++.so.6 \
         && ln -s /usr/lib/libstdc++.so.6.0.30 /usr/lib/libstdc++.so.6; \
     fi
