@@ -2,7 +2,7 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 ARG NODE_VERSION
 
-FROM alpine:3.15 as alpine
+FROM alpine:3.15 AS alpine
 RUN apk add --no-cache --repository https://nl.alpinelinux.org/alpine/edge/main libstdc++
 
 FROM node:${NODE_VERSION}-alpine AS node
