@@ -16,8 +16,8 @@ USER root
 RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
         apk update \
         && apk add --no-chache libstdc++ \
-        && rm /usr/lib/libstdc\+\+.so.6 \
-        && ln -s /usr/lib/libstdc\+\+.so.6.0.30 /usr/lib/libstdc\+\+.so.6; \
+        && rm /usr/lib/libstdc++.so.6 \
+        && ln -s /usr/lib/libstdc++.so.6.0.30 /usr/lib/libstdc++.so.6; \
     fi
 
 # Copy Node to PHP
