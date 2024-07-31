@@ -2,9 +2,6 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 ARG NODE_VERSION
 
-FROM alpine:3.15 AS libstdc
-RUN apk update && apk add --no-cache libstdc++
-
 FROM node:${NODE_VERSION}-alpine AS node
 RUN npm install -g grunt-cli gulp
 
@@ -16,13 +13,11 @@ FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
 # Conditional copy from libstdc if PHP_VERSION is 7.2
-RUN --mount=type=bind,from=libstdc,source=/,target=/libstdc \
-    if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
-        ls -la /libstdc/usr/lib/ \
-        && cp -ra /libstdc/usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6.0.28 \
-        && ls -la /usr/lib/ \
-        && rm /usr/lib/libstdc++.so.6 \
-        && ln -s /usr/lib/libstdc++.so.6.0.28 /usr/lib/libstdc++.so.6; \
+RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) = "7.2" ]]; then \
+        apk update \
+        && apk add --no-chache libstdc++ \
+        && rm /usr/lib/libstdc\+\+.so.6 \
+        && ln -s /usr/lib/libstdc\+\+.so.6.0.30 /usr/lib/libstdc\+\+.so.6; \
     fi
 
 # Copy Node to PHP
