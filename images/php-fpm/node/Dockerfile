@@ -24,7 +24,11 @@ RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/opt/* /opt
 RUN npm -v
 
 RUN apk update \
-    && apk del ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libjxl libstdc++ \
-    && apk add --update --no-cache ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libjxl libstdc++
+    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
+        if apk info -e $pkg; then apk del $pkg; fi; \
+    done \
+    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
+        if apk info -e $pkg; then apk add --update --no-cache $pkg; fi; \
+    done
 
 USER www-data

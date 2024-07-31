@@ -11,8 +11,8 @@ FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
 USER root
 ARG PHP_VERSION
 
-ENV MAILHOG_HOST    mailhog
-ENV MAILHOG_PORT    1025
+ENV MAILHOG_HOST=mailhog
+ENV MAILHOG_PORT=1025
 
 # PHP Extension Installer
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
