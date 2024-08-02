@@ -8,23 +8,19 @@ RUN npm install -g grunt-cli gulp
 FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
-RUN apk update \
-    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
-        if apk info -e $pkg; then apk del $pkg; fi; \
-    done \
-    && for pkg in ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libstdc++; do \
-        if apk info -e $pkg; then apk add --update --no-cache $pkg; fi; \
-    done
-
 # Copy Node to PHP
-RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/lib/* /usr/lib && ls -la /usr/lib
+RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/lib/* /usr/lib
 RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/local/share/* /usr/local/lib
-RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/local/lib/* /usr/local/lib && ls -la /usr/local/lib/node_modules/npm/bin
-RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/local/include/* /usr/local/include && ls -la /usr/local/include
+RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/local/lib/* /usr/local/lib
+RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/usr/local/include/* /usr/local/include
 RUN --mount=type=bind,from=node,source=/,target=/node ls -la /node/usr/local/bin &&  cp -ra /node/usr/local/bin/* /usr/local/bin && ls -la /usr/local/bin
-RUN npm -v
 
 # Copy Yarn
-RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/opt/* /opt && ls -la /opt
+RUN --mount=type=bind,from=node,source=/,target=/node cp -ra /node/opt/* /opt
+RUN npm -v
+
+RUN apk update \
+    && apk del ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libjxl libstdc++ \
+    && apk add --update --no-cache ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libjxl libstdc++
 
 USER www-data
