@@ -1,5 +1,9 @@
 FROM python:3.6-alpine3.7
 
+RUN ln -s /usr/bin/pip /usr/bin/pip3
+
+RUN pip install --upgrade pip
+
 # Upgrade and install basic Python dependencies
 # This block added because of the trouble installing gevent on many systems
 # https://hub.docker.com/r/openwhisk/dockerskeleton/~/dockerfile/
@@ -7,24 +11,29 @@ RUN apk update && \
     apk add supervisor && \
     apk add --update py2-pip && \
     apk add --no-cache bash && \
-    apk add --no-cache --virtual .build-deps bzip2-dev gcc libc-dev libffi-dev openssl-dev python3-dev make
+    apk add --no-cache --virtual .build-deps bzip2-dev gcc libc-dev libffi-dev openssl-dev python3-dev make rsync yaml-dev curl
 
-
-# Download ElasticHQ
-RUN cd /tmp && \
-    wget -q $(wget -qO- https://api.github.com/repos/ElasticHQ/elasticsearch-HQ/releases/latest | grep "zipball_url" | cut -d '"' -f 4) -O elastichq.zip && \
-    unzip elastichq.zip \
-
-# Copy source code
-RUN mv /tmp/*elasticsearch-HQ*/* /src
+# Install Rust using rustup
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
+    source $HOME/.cargo/env && \
+    rustup default stable
 
 # Set working directory
 WORKDIR /src
 
+# Download ElasticHQ
+RUN wget -q $(wget -qO- https://api.github.com/repos/ElasticHQ/elasticsearch-HQ/releases/latest | grep "zipball_url" | cut -d '"' -f 4) -O /tmp/elastichq.zip \
+    && unzip /tmp/elastichq.zip -d /tmp \
+    && rsync -a /tmp/*elasticsearch-HQ*/* /src --remove-source-files
+
+# Replace Flask-Migrate with Flask-Migrate===2.7.0 in requirements.txt
+RUN sed -i 's/Flask-Migrate/Flask-Migrate==2.7.0/' requirements.txt
+
 # Install app dependencies and create supervisord dirs
-RUN pip3 install -U -r requirements.txt && \
-    pip3 install gunicorn==19.7.1 && \
-    mkdir -p /etc/supervisor/conf.d /var/log/supervisor /var/run/supervisor
+RUN pip install pyyaml==5.3.1 \
+    && pip install -U -r requirements.txt \
+    && pip install gunicorn==19.7.1 \
+    && mkdir -p /etc/supervisor/conf.d /var/log/supervisor /var/run/supervisor
 
 # Copy configuration files
 RUN cp /src/deployment/logging.conf /src/logging.conf && \
