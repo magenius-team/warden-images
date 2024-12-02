@@ -10,11 +10,13 @@ RUN apk update && \
     apk add --no-cache --virtual .build-deps bzip2-dev gcc libc-dev libffi-dev openssl-dev python3-dev make
 
 
-# Copy source code
+# Download ElasticHQ
 RUN cd /tmp && \
     wget -q $(wget -qO- https://api.github.com/repos/ElasticHQ/elasticsearch-HQ/releases/latest | grep "zipball_url" | cut -d '"' -f 4) -O elastichq.zip && \
-    unzip elastichq.zip && \
-    mv *elasticsearch-HQ*/* /src
+    unzip elastichq.zip \
+
+# Copy source code
+RUN mv /tmp/*elasticsearch-HQ*/* /src
 
 # Set working directory
 WORKDIR /src
