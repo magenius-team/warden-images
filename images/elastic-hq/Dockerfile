@@ -7,16 +7,17 @@ RUN pip install --upgrade pip
 # Upgrade and install basic Python dependencies
 # This block added because of the trouble installing gevent on many systems
 # https://hub.docker.com/r/openwhisk/dockerskeleton/~/dockerfile/
-RUN apk update && \
-    apk add supervisor && \
-    apk add --update py2-pip && \
-    apk add --no-cache bash && \
-    apk add --no-cache --virtual .build-deps bzip2-dev gcc libc-dev libffi-dev openssl-dev python3-dev make rsync yaml-dev curl
+RUN apk update \
+    && apk add supervisor \
+    && apk add --update py2-pip \
+    && apk add --no-cache bash \
+    && apk add --no-cache --virtual .build-deps bzip2-dev gcc libc-dev libffi-dev openssl-dev python3-dev make rsync yaml-dev curl
 
 # Install Rust using rustup
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y && \
-    source $HOME/.cargo/env && \
-    rustup default stable
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && source "$HOME/.cargo/env" \
+    && ln -s $HOME/.cargo/bin/cargo /usr/local/bin/cargo \
+    && ln -s $HOME/.cargo/bin/rustc /usr/local/bin/rustc
 
 # Set working directory
 WORKDIR /src
@@ -25,9 +26,6 @@ WORKDIR /src
 RUN wget -q $(wget -qO- https://api.github.com/repos/ElasticHQ/elasticsearch-HQ/releases/latest | grep "zipball_url" | cut -d '"' -f 4) -O /tmp/elastichq.zip \
     && unzip /tmp/elastichq.zip -d /tmp \
     && rsync -a /tmp/*elasticsearch-HQ*/* /src --remove-source-files
-
-# Replace Flask-Migrate with Flask-Migrate===2.7.0 in requirements.txt
-RUN sed -i 's/Flask-Migrate/Flask-Migrate==2.7.0/' requirements.txt
 
 # Install app dependencies and create supervisord dirs
 RUN pip install pyyaml==5.3.1 \
