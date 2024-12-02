@@ -12,7 +12,7 @@ RUN apk update && \
 
 # Copy source code
 RUN cd /tmp && \
-    curl -L $(curl -s https://api.github.com/repos/ElasticHQ/elasticsearch-HQ/releases/latest | grep "zipball_url" | cut -d '"' -f 4) -o elastichq.zip && \
+    wget -q $(wget -qO- https://api.github.com/repos/ElasticHQ/elasticsearch-HQ/releases/latest | grep "zipball_url" | cut -d '"' -f 4) -O elastichq.zip && \
     unzip elastichq.zip && \
     mv *elasticsearch-HQ*/* /src
 
