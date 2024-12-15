@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.3
       - id: matrix
         run: |
           php .github/workflows/php-matrix/php-generator.php >> $GITHUB_OUTPUT
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.3
       - id: matrix
         run: |
           php .github/workflows/php-matrix/node-generator.php >> $GITHUB_OUTPUT
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.3
       - id: matrix
         run: |
           php .github/workflows/php-matrix/blackfire-generator.php >> $GITHUB_OUTPUT
@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
+          php-version: 8.3
       - id: matrix
         run: |
           php .github/workflows/php-matrix/full-generator.php >> $GITHUB_OUTPUT
