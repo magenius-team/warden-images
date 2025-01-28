@@ -12,13 +12,13 @@ ENV MAILHOG_HOST=mailhog
 ENV MAILHOG_PORT=1025
 
 # PHP Extension Installer
-ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 # Copy mhsendmail to PHP
 COPY --from=mhs-builder /go/bin/mhsendmail /usr/local/bin/mhsendmail
 
 # Install PHP Extensions required by Magento OS, Adobe Commerce, and the UCT (pcntl)
-RUN chmod +x /usr/local/bin/install-php-extensions && install-php-extensions \
+RUN install-php-extensions \
     apcu \
     amqp \
     bcmath \
@@ -115,7 +115,6 @@ RUN groupmod -g 1000 www-data && usermod -u 1000 www-data \
 
 # Override stop signal to stop process gracefully
 # https://github.com/php/php-src/blob/17baa87faddc2550def3ae7314236826bc1b1398/sapi/fpm/php-fpm.8.in#L163
-# Credit: davidalger
 STOPSIGNAL SIGQUIT
 
 ENTRYPOINT ["docker-entrypoint"]
