@@ -74,11 +74,12 @@ jobs:
   php-fpm:
     needs: php-matrix
     name: PHP-FPM ${{ matrix.php_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     continue-on-error: false
     strategy:
       fail-fast: false
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.php-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -114,13 +115,14 @@ jobs:
 
   php-node:
     name: PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-fpm, node-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 6 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.node-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -155,13 +157,14 @@ jobs:
 
   xdebug3:
     name: PHP-FPM ${{ matrix.php_version }} + XDebug 3
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -197,13 +200,14 @@ jobs:
 
   xdebug3-node:
     name: PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -239,13 +243,14 @@ jobs:
 
   spx:
     name: PHP-FPM ${{ matrix.php_version }} + SPX
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -280,13 +285,14 @@ jobs:
 
   spx-node:
     name: PHP-FPM ${{ matrix.php_version }} + SPX + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -321,13 +327,14 @@ jobs:
 
   blackfire:
     name: PHP-FPM ${{ matrix.php_version }} + Blackfire
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -362,13 +369,14 @@ jobs:
 
   blackfire-node:
     name: PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -403,13 +411,14 @@ jobs:
 
   magento1:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -444,13 +453,14 @@ jobs:
 
   magento1-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -485,13 +495,14 @@ jobs:
 
   magento1-xdebug3:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento1, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -527,13 +538,14 @@ jobs:
 
   magento1-xdebug3-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento1, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -569,13 +581,14 @@ jobs:
 
   magento1-spx:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + SPX
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento1, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -610,13 +623,14 @@ jobs:
 
   magento1-spx-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + SPX + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento1, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -651,13 +665,14 @@ jobs:
 
   magento1-blackfire:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento1, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -692,13 +707,14 @@ jobs:
 
   magento1-blackfire-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento1, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -733,13 +749,14 @@ jobs:
 
   magento2:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -774,13 +791,14 @@ jobs:
 
   magento2-node:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ php-node, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -815,13 +833,14 @@ jobs:
 
   magento2-xdebug3:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + XDebug 3
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento2, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -857,13 +876,14 @@ jobs:
 
   magento2-xdebug3-node:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento2, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -899,13 +919,14 @@ jobs:
 
   magento2-spx:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + SPX
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento2, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -940,13 +961,14 @@ jobs:
 
   magento2-spx-node:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + SPX + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento2, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -981,13 +1003,14 @@ jobs:
 
   magento2-blackfire:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Blackfire
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento2, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
@@ -1022,13 +1045,14 @@ jobs:
 
   magento2-blackfire-node:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: [ magento2, full-matrix ]
     continue-on-error: false
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix:
+        os: ${{ fromJson(vars.RUN_ON_OS) }}
         include: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
