@@ -17,7 +17,7 @@ jobs:
     container:
       image: php:8.4-cli-alpine
     outputs:
-      include: ${{ steps.matrix.outputs.include }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     env:
       PHP_LATEST: ${{ vars.PHP_LATEST }}
       PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
@@ -29,7 +29,7 @@ jobs:
       - id: matrix
         run: |
           php .github/workflows/php-matrix/php-generator.php >> $GITHUB_OUTPUT
-      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.include }}'
+      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
 
   node-matrix:
     name: Generate Base PHP-Node Matrix
@@ -37,7 +37,7 @@ jobs:
     container:
       image: php:8.4-cli-alpine
     outputs:
-      include: ${{ steps.matrix.outputs.include }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     env:
       PHP_LATEST: ${{ vars.PHP_LATEST }}
       PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
@@ -49,7 +49,7 @@ jobs:
       - id: matrix
         run: |
           php .github/workflows/php-matrix/node-generator.php >> $GITHUB_OUTPUT
-      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.include }}'
+      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
 
   full-matrix:
     name: Generate Full Matrix
@@ -57,7 +57,7 @@ jobs:
     container:
       image: php:8.4-cli-alpine
     outputs:
-      include: ${{ steps.matrix.outputs.include }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     env:
       PHP_LATEST: ${{ vars.PHP_LATEST }}
       PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
@@ -69,7 +69,7 @@ jobs:
       - id: matrix
         run: |
           php .github/workflows/php-matrix/full-generator.php >> $GITHUB_OUTPUT
-      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.include }}'
+      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
 
   php-fpm:
     needs: php-matrix
@@ -78,9 +78,7 @@ jobs:
     continue-on-error: false
     strategy:
       fail-fast: false
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.php-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.php-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -121,9 +119,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 6 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.node-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.node-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -163,9 +159,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -206,9 +200,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -249,9 +241,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -291,9 +281,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -333,9 +321,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -375,9 +361,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -417,9 +401,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -459,9 +441,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -501,9 +481,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -544,9 +522,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -587,9 +563,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -629,9 +603,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -671,9 +643,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -713,9 +683,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -755,9 +723,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -797,9 +763,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -839,9 +803,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -882,9 +844,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -925,9 +885,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -967,9 +925,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -1009,9 +965,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -1051,9 +1005,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix:
-        os: ${{ fromJson(vars.RUN_ON_OS) }}
-        include: ${{ fromJson(needs.full-matrix.outputs.include) }}
+      matrix: ${{ fromJson(needs.full-matrix.outputs.include) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3

@@ -2,25 +2,29 @@
 
 include(__DIR__ . DIRECTORY_SEPARATOR . 'constants.php');
 
-global $phpLatest, $phpVersions, $nodeLatest, $nodeVersions, $notStableXdebugPhpVersions;
+global $osVersions, $phpLatest, $phpVersions, $nodeLatest, $nodeVersions, $notStableXdebugPhpVersions;
 $matrix = [];
 
-foreach ($phpVersions as $phpVersion) {
-    $xdebugType = !in_array($phpVersion, $notStableXdebugPhpVersions) ? 'xdebug-stable' : 'xdebug';
-    $matrix[] = [
-        'php_version' => $phpVersion,
-        'node_version' => 'x',
-        'xdebug_type' => $xdebugType,
-        'latest' => $phpVersion === $phpLatest,
-    ];
-    foreach ($nodeVersions as $nodeVersion) {
+foreach ($osVersions as $osVersion) {
+    foreach ($phpVersions as $phpVersion) {
+        $xdebugType = !in_array($phpVersion, $notStableXdebugPhpVersions) ? 'xdebug-stable' : 'xdebug';
         $matrix[] = [
+            'os' => $osVersion,
             'php_version' => $phpVersion,
-            'node_version' => $nodeVersion,
+            'node_version' => 'x',
             'xdebug_type' => $xdebugType,
-            'latest' => $phpVersion === $phpLatest && $nodeVersion === $nodeLatest,
+            'latest' => $phpVersion === $phpLatest,
         ];
+        foreach ($nodeVersions as $nodeVersion) {
+            $matrix[] = [
+                'os' => $osVersion,
+                'php_version' => $phpVersion,
+                'node_version' => $nodeVersion,
+                'xdebug_type' => $xdebugType,
+                'latest' => $phpVersion === $phpLatest && $nodeVersion === $nodeLatest,
+            ];
+        }
     }
 }
 
-echo 'include=' . json_encode($matrix);
+echo 'matrix=' . json_encode(['include' => $matrix]);

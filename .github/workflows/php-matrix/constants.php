@@ -1,5 +1,6 @@
 <?php
 
+$osVersions = explode(',', getenv('RUN_ON_OS'));
 $phpLatest = getenv('PHP_LATEST');
 $phpVersions = explode(',', getenv('PHP_VERSIONS'));
 $nodeLatest = getenv('NODE_LATEST');

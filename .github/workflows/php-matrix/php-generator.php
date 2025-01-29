@@ -2,14 +2,17 @@
 
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'constants.php');
 
-global $phpLatest, $phpVersions;
+global $osVersions, $phpLatest, $phpVersions;
 $matrix = [];
 
-foreach ($phpVersions as $phpVersion) {
-    $matrix[] = [
-        'php_version' => $phpVersion,
-        'latest' => $phpVersion === $phpLatest,
-    ];
+foreach ($osVersions as $osVersion) {
+    foreach ($phpVersions as $phpVersion) {
+        $matrix[] = [
+            'os' => $osVersion,
+            'php_version' => $phpVersion,
+            'latest' => $phpVersion === $phpLatest,
+        ];
+    }
 }
 
-echo 'include=' . json_encode($matrix);
+echo 'matrix=' . json_encode(['include' => $matrix]);
