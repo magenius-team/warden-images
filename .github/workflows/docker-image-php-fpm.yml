@@ -19,6 +19,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     env:
+      RUN_ON_OS: ${{ vars.RUN_ON_OS }}
       PHP_LATEST: ${{ vars.PHP_LATEST }}
       PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
       NODE_LATEST: ${{ vars.NODE_LATEST }}
@@ -39,6 +40,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     env:
+      RUN_ON_OS: ${{ vars.RUN_ON_OS }}
       PHP_LATEST: ${{ vars.PHP_LATEST }}
       PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
       NODE_LATEST: ${{ vars.NODE_LATEST }}
@@ -59,6 +61,7 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     env:
+      RUN_ON_OS: ${{ vars.RUN_ON_OS }}
       PHP_LATEST: ${{ vars.PHP_LATEST }}
       PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
       NODE_LATEST: ${{ vars.NODE_LATEST }}
