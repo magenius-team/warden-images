@@ -42,6 +42,11 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/dnsmasq:latest
 
+  delete-versions:
+    name: Delete versions
+    needs: [ dnsmasq ]
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/delete-package-versions@v5
         with:
           package-name: 'dnsmasq'

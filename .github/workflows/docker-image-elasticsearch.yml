@@ -65,6 +65,11 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/elasticsearch:${{ matrix.version }}
 
+  delete-versions:
+    name: Delete versions
+    needs: [ elasticsearch ]
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/delete-package-versions@v5
         with:
           package-name: 'elasticsearch'
