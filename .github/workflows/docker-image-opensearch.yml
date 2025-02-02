@@ -86,19 +86,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch OpenSearch Versions
-        id: fetch-versions
-        run: |
-          VERSIONS=$(curl -s -H "Authorization: Bearer ${{ secrets.PACKAGE_READ_TOKEN }}" 'https://ghcr.io/v2/magenius-team/opensearch/tags/list' \
-            | jq -r '.tags[]' \
-            | sort -Vr)
-          echo "::set-output name=versions::$VERSIONS"
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios
 
       - name: Update README.md
-        run: |
-          VERSIONS="${{ steps.fetch-versions.outputs.versions }}"
-          MAJOR_MINOR_VERSIONS=$(echo "$VERSIONS" | awk -F. '{print $1"."$2}' | uniq | tr '\n' ', ' | sed 's/, $//')
-          sed -i '/| OpenSearch |/c\| OpenSearch | '"$MAJOR_MINOR_VERSIONS"' |' README.md
+        run: node .github/workflows/actions/readme-update.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.PACKAGE_READ_TOKEN }}
+          PACKAGE_NAME: OpenSearch
 
       - name: Commit changes
         run: |
