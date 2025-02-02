@@ -1,7 +1,7 @@
 name: Docker Image OpenSearch
 on:
   schedule:
-    - cron: "0 3 * * 0" # At 03:00 on Sunday
+    - cron: "0 3 1 * *" # At 03:00 on day-of-month 1
   push:
     branches:
       - 'main'
@@ -17,8 +17,15 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
-        run: echo "matrix=${{ vars.OPENSEARCH_MATRIX }}" >> $GITHUB_OUTPUT
-      - run: echo "Matrix:\n";echo '${{ steps.set-matrix.outputs.matrix }}'
+        run: |
+          VERSIONS=$(curl -s https://registry.hub.docker.com/v2/repositories/opensearchproject/opensearch/tags?page_size=200 \
+            | jq -r '.results[].name' \
+            | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
+            | sort -Vr \
+            | head -n 3)
+          MATRIX=$(jq -n --arg versions "$VERSIONS" '{"version": ($versions | split("\n") | map(select(length > 0)))}')
+          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
+      - run: echo "Matrix:\n"; echo '${{ steps.set-matrix.outputs.matrix }}'
 
   opensearch:
     needs: build-matrix
