@@ -79,3 +79,25 @@ jobs:
           package-type: 'container'
           min-versions-to-keep: 0
           delete-only-untagged-versions: 'true'
+
+      - name: Fetch OpenSearch Versions
+        id: fetch-versions
+        run: |
+          VERSIONS=$(curl -s -H "Authorization: Bearer ${{ secrets.PACKAGE_READ_TOKEN }}" 'https://ghcr.io/v2/magenius-team/opensearch/tags/list' \
+            | jq -r '.tags[]' \
+            | sort -Vr)
+          echo "::set-output name=versions::$VERSIONS"
+
+      - name: Update README.md
+        run: |
+          VERSIONS="${{ steps.fetch-versions.outputs.versions }}"
+          MAJOR_MINOR_VERSIONS=$(echo "$VERSIONS" | awk -F. '{print $1"."$2}' | uniq | tr '\n' ', ' | sed 's/, $//')
+          sed -i '/| OpenSearch |/c\| OpenSearch | '"$MAJOR_MINOR_VERSIONS"' |' README.md
+
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git commit -m "Update OpenSearch versions in README.md"
+          git push
