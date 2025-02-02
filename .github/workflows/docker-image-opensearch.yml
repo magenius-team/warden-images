@@ -23,7 +23,8 @@ jobs:
             | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
             | sort -Vr \
             | head -n 3)
-          MATRIX=$(jq -c -n --arg versions "$VERSIONS" '{"version": ($versions | split("\n") | map(select(length > 0)))}')
+          LATEST_VERSIONS=$(echo "$VERSIONS" | awk -F. '{print $1"."$2}' | uniq | while read version; do echo "$VERSIONS" | grep "^$version" | head -n 1; done)
+          MATRIX=$(jq -c -n --arg versions "$LATEST_VERSIONS" '{"version": ($versions | split("\n") | map(select(length > 0)))}')
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
       - run: echo "Matrix:\n${{ steps.set-matrix.outputs.matrix }}"
 
