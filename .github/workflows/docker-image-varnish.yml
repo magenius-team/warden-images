@@ -112,9 +112,47 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/varnish:${{ matrix.version }}
 
+  delete-versions:
+    name: Delete versions
+    needs: [ varnish ]
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/delete-package-versions@v5
         with:
           package-name: 'varnish'
           package-type: 'container'
           min-versions-to-keep: 0
           delete-only-untagged-versions: 'true'
+
+  update-readme:
+    name: Update README.md
+    needs: [ varnish, varnish-lts ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Update README.md
+        run: node .github/workflows/actions/readme-update.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_NAME: Varnish
+
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update Varnish versions in README.md"
+            git push
+          else
+            echo "No changes to commit"
+          fi
