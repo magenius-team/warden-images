@@ -24,8 +24,8 @@ jobs:
             | sort -Vr \
             | head -n 3)
           MATRIX=$(jq -n --arg versions "$VERSIONS" '{"version": ($versions | split("\n") | map(select(length > 0)))}')
-          echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
-      - run: echo "Matrix:\n"; echo '${{ steps.set-matrix.outputs.matrix }}'
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+      - run: echo "Matrix:\n${{ steps.set-matrix.outputs.matrix }}"
 
   opensearch:
     needs: build-matrix
