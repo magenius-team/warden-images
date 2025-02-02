@@ -97,7 +97,7 @@ jobs:
       - name: Update README.md
         run: node .github/workflows/actions/readme-update.js
         env:
-          GITHUB_TOKEN: ${{ secrets.PACKAGE_READ_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGE_NAME: OpenSearch
 
       - name: Commit changes
