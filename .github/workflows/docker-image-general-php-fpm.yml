@@ -8,7 +8,7 @@ on:
     paths:
       - version
       - images/php-fpm/**
-      - .github/workflows/*php-fpm*
+      - .github/workflows/*general-php-fpm*
       - .github/workflows/php-matrix/**
 jobs:
   php-matrix:
