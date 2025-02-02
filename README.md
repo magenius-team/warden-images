@@ -16,7 +16,7 @@ This repository contain image build configurations used in MAgenius fork of [War
 | Nginx                   | 1.16, 1.17, 1.18, 1.19, 1.20, 1.21, 1.22, 1.23, 1.25, 1.26                                                           |
 | MySQL                   | 8.0, 8.4                                                                                                             |
 | MariaDB                 | 10.0, 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 10.10, 10.11, 11.0, 11.1, 11.2, 11.3                     |
-| Magepack                | 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11                                                                        |
+| Magepack                | 2.1, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11 |
 
 ## License
 
