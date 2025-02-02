@@ -80,6 +80,12 @@ jobs:
           min-versions-to-keep: 0
           delete-only-untagged-versions: 'true'
 
+  update-readme:
+    needs: [opensearch]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Fetch OpenSearch Versions
         id: fetch-versions
         run: |
