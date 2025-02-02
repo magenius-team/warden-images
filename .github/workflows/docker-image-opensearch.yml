@@ -18,7 +18,7 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          VERSIONS=$(curl -s https://registry.hub.docker.com/v2/repositories/opensearchproject/opensearch/tags?page_size=200 \
+          VERSIONS=$(curl -s 'https://registry.hub.docker.com/v2/repositories/opensearchproject/opensearch/tags?page_size=200' \
             | jq -r '.results[].name' \
             | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
             | sort -Vr \
