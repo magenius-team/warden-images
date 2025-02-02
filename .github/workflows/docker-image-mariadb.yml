@@ -55,3 +55,10 @@ jobs:
           build-args: MARIADB_VERSION=${{ matrix.version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/mariadb:${{ matrix.version }}
+
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'mariadb'
+          package-type: 'container'
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true'

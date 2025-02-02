@@ -64,3 +64,10 @@ jobs:
           build-args: OPENSEARCH_VERSION=${{ env.OPENSEARCH_VERSION }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/opensearch:${{ matrix.version }}
+
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'opensearch'
+          package-type: 'container'
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true'

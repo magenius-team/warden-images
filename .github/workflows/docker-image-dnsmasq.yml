@@ -41,3 +41,10 @@ jobs:
           build-args: WEBPROC_VERSION=0.4.0
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/dnsmasq:latest
+
+      - uses: actions/delete-package-versions@v5
+        with:
+          package-name: 'dnsmasq'
+          package-type: 'container'
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: 'true'
