@@ -55,6 +55,11 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/redis:${{ matrix.version }}
 
+  delete-versions:
+    name: Delete versions
+    needs: [ redis ]
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/delete-package-versions@v5
         with:
           package-name: 'redis'
