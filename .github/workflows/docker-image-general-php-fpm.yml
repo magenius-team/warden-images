@@ -14,7 +14,7 @@ jobs:
     continue-on-error: false
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.php-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.php-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 6 || 0 }}
-      matrix: ${{ fromJson(needs.node-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.node-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -95,7 +95,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -136,7 +136,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -177,7 +177,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -217,7 +217,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -257,7 +257,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
@@ -297,7 +297,7 @@ jobs:
     strategy:
       fail-fast: false
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
-      matrix: ${{ fromJson(needs.full-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
