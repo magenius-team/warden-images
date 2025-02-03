@@ -1,6 +1,11 @@
 name: Docker Image PHP-FPM
 on:
   workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
   workflow_dispatch:
 
 jobs:
