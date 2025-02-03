@@ -16,6 +16,7 @@ jobs:
 
   general-php-fpm:
     uses: ./.github/workflows/docker-image-general-php-fpm.yml
+    secrets: inherit
 
   magento2:
     name: Magento 2 PHP-FPM ${{ matrix.php_version }}
