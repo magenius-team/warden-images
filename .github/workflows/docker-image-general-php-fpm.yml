@@ -17,8 +17,6 @@ jobs:
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.php-matrix) }}
     steps:
       - uses: actions/checkout@v4
-      - name: Debug Matrix Output
-        run: echo '${{ needs.call-matrix-generator.outputs.php_matrix }}'
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry

@@ -3,13 +3,13 @@ name: Matrix Generator
 on:
   workflow_call:
     outputs:
-      php_matrix:
+      php-matrix:
         description: 'Generated PHP matrix'
         value: ${{ jobs.php-matrix.outputs.matrix }}
-      node_matrix:
+      node-matrix:
         description: 'Generated PHP-Node matrix'
         value: ${{ jobs.node-matrix.outputs.matrix }}
-      full_matrix:
+      full-matrix:
         description: 'Generated full matrix'
         value: ${{ jobs.full-matrix.outputs.matrix }}
 
