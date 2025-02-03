@@ -1,41 +1,23 @@
 name: Docker Image Magento 1 PHP-FPM
 on:
   schedule:
-    - cron: "0 3 1 * *"   # At 03:00 on day-of-month 1
+    - cron: "0 3 1 * *" # At 03:00 on day-of-month 1
+  workflow_dispatch:
   push:
     branches:
       - 'main'
     paths:
       - version
-      - images/php-fpm/**
-      - .github/workflows/*magento1-php-fpm*
-      - .github/workflows/php-matrix/**
+      - images/php-fpm/magento1/**
+
 jobs:
-  full-matrix:
-    name: Generate Full Matrix
-    runs-on: ubuntu-latest
-    container:
-      image: php:8.4-cli-alpine
-    outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
-    env:
-      RUN_ON_OS: ${{ vars.RUN_ON_OS }}
-      PHP_LATEST: ${{ vars.PHP_LATEST }}
-      PHP_VERSIONS: ${{ vars.PHP_VERSIONS }}
-      NODE_LATEST: ${{ vars.NODE_LATEST }}
-      NODE_VERSIONS: ${{ vars.NODE_VERSIONS }}
-      NOT_STABLE_XDEBUG_PHP_VERSIONS: ${{ vars.NOT_STABLE_XDEBUG_PHP_VERSIONS }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: matrix
-        run: |
-          php .github/workflows/php-matrix/full-generator.php >> $GITHUB_OUTPUT
-      - run: echo "Matrix:\n";echo '${{ steps.matrix.outputs.matrix }}'
+  call-matrix-generator:
+    uses: ./.github/workflows/php-matrix-generator.yml
 
   magento1:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ full-matrix ]
+    needs: [ call-matrix-generator ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -75,7 +57,7 @@ jobs:
   magento1-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ full-matrix ]
+    needs: [ call-matrix-generator ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -115,7 +97,7 @@ jobs:
   magento1-xdebug3:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, full-matrix ]
+    needs: [ magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -156,7 +138,7 @@ jobs:
   magento1-xdebug3-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, full-matrix ]
+    needs: [ magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -197,7 +179,7 @@ jobs:
   magento1-spx:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + SPX
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, full-matrix ]
+    needs: [ magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -237,7 +219,7 @@ jobs:
   magento1-spx-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + SPX + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, full-matrix ]
+    needs: [ magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -277,7 +259,7 @@ jobs:
   magento1-blackfire:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, full-matrix ]
+    needs: [ magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -317,7 +299,7 @@ jobs:
   magento1-blackfire-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, full-matrix ]
+    needs: [ magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false

@@ -2,13 +2,13 @@ name: Docker Image Varnish
 on:
   schedule:
     - cron: "0 3 * * 0" # At 03:00 on Sunday
+  workflow_dispatch:
   push:
     branches:
       - 'main'
     paths:
       - version
       - images/varnish/**
-      - .github/workflows/*varnish*
 
 jobs:
   build-matrix:

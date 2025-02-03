@@ -7,7 +7,6 @@ on:
     paths:
       - version
       - images/mailhog/**
-      - .github/workflows/*mailhog*
 
 jobs:
   build-matrix:

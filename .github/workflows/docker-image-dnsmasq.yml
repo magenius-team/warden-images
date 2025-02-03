@@ -2,13 +2,13 @@ name: Docker Image DNSMasq
 on:
   schedule:
     - cron: "0 3 * * 0" # At 03:00 on Sunday
+  workflow_dispatch:
   push:
     branches:
       - 'main'
     paths:
       - version
       - images/dnsmasq/**
-      - .github/workflows/*dnsmasq*
 
 jobs:
   dnsmasq:
