@@ -13,7 +13,9 @@ RUN arch=$(uname -m) && \
     echo https://nodejs.org/dist/latest-v${NODE_VERSION}.x/SHASUMS256.txt && \
     NODE_FILE=$(curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/SHASUMS256.txt | grep "linux-$arch.tar.xz" | awk '{print $2}') && \
     echo $NODE_FILE && \
-    curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE | tar -xJf - -C /usr/local --strip-components=1
+    curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE -o /tmp/node.tar.xz && \
+    tar -xJf /tmp/node.tar.xz -C /tmp && \
+    cp -r /tmp/${NODE_FILE%.tar.xz}/{bin,include,lib,share} /usr/
 
 # Install global npm packages
 RUN npm install -g grunt-cli gulp gulp-cli bower yarn
