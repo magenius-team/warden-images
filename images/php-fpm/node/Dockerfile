@@ -9,6 +9,7 @@ RUN arch=$(uname -m) && \
     if [ "$arch" = "x86_64" ]; then arch="x64"; fi && \
     if [ "$arch" = "aarch64" ]; then arch="arm64"; fi && \
     echo $arch && \
+    echo https://nodejs.org/dist/latest-v${NODE_VERSION}.x/SHASUMS256.txt && \
     NODE_FILE=$(curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/SHASUMS256.txt | grep "linux-$arch.tar.xz" | awk '{print $2}') && \
     echo $NODE_FILE && \
     curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE | tar -xJf - -C /usr/local --strip-components=1
