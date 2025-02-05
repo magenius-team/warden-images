@@ -1,28 +1,23 @@
 ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
+ARG NODE_VERSION
+
+FROM node:${NODE_VERSION}-alpine AS node
+RUN npm install -g grunt-cli gulp
 
 FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}
 USER root
 
-ARG NODE_VERSION
+# Copy Node to PHP
+RUN --mount=type=bind,from=node,source=/,target=/node cp -rna /node/usr/lib/* /usr/lib
+RUN --mount=type=bind,from=node,source=/,target=/node cp -rna /node/usr/local/share/* /usr/local/share
+RUN --mount=type=bind,from=node,source=/,target=/node cp -rna /node/usr/local/lib/* /usr/local/lib
+RUN --mount=type=bind,from=node,source=/,target=/node cp -rna /node/usr/local/include/* /usr/local/include
+RUN --mount=type=bind,from=node,source=/,target=/node cp -rna /node/usr/local/bin/* /usr/local/bin
 
-RUN arch=$(uname -m) && \
-    if [ "$arch" = "x86_64" ]; then arch="x64"; fi && \
-    if [ "$arch" = "aarch64" ]; then arch="arm64"; fi && \
-    echo $arch && \
-    echo https://nodejs.org/dist/latest-v${NODE_VERSION}.x/SHASUMS256.txt && \
-    NODE_FILE=$(curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/SHASUMS256.txt | grep "linux-$arch.tar.xz" | awk '{print $2}') && \
-    echo $NODE_FILE && \
-    curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE -o /tmp/node.tar.xz && \
-    tar -xJf /tmp/node.tar.xz -C /tmp && \
-    cp -r /tmp/${NODE_FILE%.tar.xz}/bin/* /usr/local/bin && \
-    cp -r /tmp/${NODE_FILE%.tar.xz}/lib/* /usr/local/lib && \
-    cp -r /tmp/${NODE_FILE%.tar.xz}/include/* /usr/local/include && \
-    cp -r /tmp/${NODE_FILE%.tar.xz}/share/* /usr/local/share && \
-    npm install -g grunt-cli gulp gulp-cli bower yarn
-
-# Install global npm packages
-RUN npm install -g grunt-cli gulp gulp-cli bower yarn
+# Copy Yarn
+RUN --mount=type=bind,from=node,source=/,target=/node cp -rna /node/opt/* /opt
+RUN npm -v
 
 RUN apk update \
     && apk del ghostscript imagemagick gcc x265-libs libheif mariadb-client fish icu-libs libde265 libjxl libstdc++ \
