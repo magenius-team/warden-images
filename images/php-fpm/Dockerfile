@@ -77,9 +77,9 @@ COPY etc/php.d/*.ini /usr/local/etc/php/conf.d/
 COPY etc/php.d/05-additions.ini.template /usr/local/etc/php/conf.d/
 
 # Install Composer
-COPY --from=composer:1 /usr/bin/composer /usr/bin/composer1
-COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer2lts
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer2
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer1 \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer2lts --version=2.2.0 \
+    && curl -sS https://getcomposer.or
 
 # If PHP < 8.2
 RUN if [[ $(printf "8.2\n${PHP_VERSION}" | sort -g |head -n1) != "8.2" ]]; \
