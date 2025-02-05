@@ -15,8 +15,10 @@ RUN arch=$(uname -m) && \
     echo $NODE_FILE && \
     curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE -o /tmp/node.tar.xz && \
     tar -xJf /tmp/node.tar.xz -C /tmp && \
-    ls -la /tmp/${NODE_FILE%.tar.xz} && \
-    cp -r /tmp/${NODE_FILE%.tar.xz}/{bin,include,lib,share} /usr/
+    cp -r /tmp/${NODE_FILE%.tar.xz}/bin/* /usr/bin && \
+    cp -r /tmp/${NODE_FILE%.tar.xz}/lib/* /usr/lib && \
+    cp -r /tmp/${NODE_FILE%.tar.xz}/include/* /usr/include && \
+    cp -r /tmp/${NODE_FILE%.tar.xz}/share/* /usr/share && \
 
 # Install global npm packages
 RUN npm install -g grunt-cli gulp gulp-cli bower yarn
