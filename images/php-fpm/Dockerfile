@@ -84,10 +84,6 @@ COPY --from=public.ecr.aws/docker/library/composer:2 /usr/bin/composer /usr/bin/
 RUN if [[ $(printf "8.2\n${PHP_VERSION}" | sort -g |head -n1) != "8.2" ]]; \
     then install-php-extensions mcrypt; fi
 
-# If PHP < 7.2
-RUN if [[ $(printf "7.2\n${PHP_VERSION}" | sort -g | head -n1) != "7.2" ]]; \
-    then mv /usr/bin/composer2lts /usr/bin/composer2; fi
-
 # If PHP >= 7.1
 RUN if [[ $(printf "7.1\n${PHP_VERSION}" | sort -g | head -n1) == "7.1" ]]; \
     then apk --no-cache add mariadb-connector-c; fi

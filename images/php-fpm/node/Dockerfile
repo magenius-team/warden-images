@@ -2,6 +2,10 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 ARG NODE_VERSION
 
+RUN if [ "$(printf '7.4\n%s' "$PHP_VERSION" | sort -V | head -n1)" = "7.4" ]; then \
+        NODE_VERSION=20; \
+    fi
+
 FROM public.ecr.aws/docker/library/node:${NODE_VERSION}-alpine AS node
 RUN npm install -g grunt-cli gulp
 
