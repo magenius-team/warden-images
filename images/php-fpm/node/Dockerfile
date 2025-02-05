@@ -18,7 +18,7 @@ RUN arch=$(uname -m) && \
     cp -r /tmp/${NODE_FILE%.tar.xz}/bin/* /usr/bin && \
     cp -r /tmp/${NODE_FILE%.tar.xz}/lib/* /usr/lib && \
     cp -r /tmp/${NODE_FILE%.tar.xz}/include/* /usr/include && \
-    cp -r /tmp/${NODE_FILE%.tar.xz}/share/* /usr/share && \
+    cp -r /tmp/${NODE_FILE%.tar.xz}/share/* /usr/share
 
 # Install global npm packages
 RUN npm install -g grunt-cli gulp gulp-cli bower yarn
