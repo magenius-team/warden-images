@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM public.ecr.aws/docker/library/golang:alpine as builder
 ARG WEBPROC_VERSION=0.4.0
 RUN apk --no-cache add --virtual build-dependencies \
     git \

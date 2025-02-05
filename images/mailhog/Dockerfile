@@ -1,4 +1,4 @@
-FROM golang:alpine as builder
+FROM public.ecr.aws/docker/library/golang:alpine as builder
 
 # Install MailHog:
 ARG MAILHOG_VERSION

@@ -1,2 +1,2 @@
 ARG RABBITMQ_VERSION
-FROM rabbitmq:${RABBITMQ_VERSION}-management
+FROM public.ecr.aws/docker/library/rabbitmq:${RABBITMQ_VERSION}-management

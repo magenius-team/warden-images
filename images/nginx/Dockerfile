@@ -1,5 +1,5 @@
 ARG NGINX_VERSION
-FROM nginx:${NGINX_VERSION}-alpine
+FROM public.ecr.aws/docker/library/nginx:${NGINX_VERSION}-alpine
 RUN apk add --no-cache bash shadow
 
 ENV NGINX_UPSTREAM_HOST           php-fpm
