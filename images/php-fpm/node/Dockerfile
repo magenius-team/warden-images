@@ -2,7 +2,7 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 ARG NODE_VERSION
 
-FROM node:${NODE_VERSION}-alpine AS node
+FROM public.ecr.aws/docker/library/node:${NODE_VERSION}-alpine AS node
 RUN npm install -g grunt-cli gulp
 
 FROM ${ENV_SOURCE_IMAGE}:${PHP_VERSION}

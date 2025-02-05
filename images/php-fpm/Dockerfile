@@ -1,7 +1,7 @@
 ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 
-FROM golang:alpine AS mhs-builder
+FROM public.ecr.aws/docker/library/golang:alpine AS mhs-builder
 RUN go install github.com/mailhog/mhsendmail@latest
 
 FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
@@ -77,10 +77,8 @@ COPY etc/php.d/*.ini /usr/local/etc/php/conf.d/
 COPY etc/php.d/05-additions.ini.template /usr/local/etc/php/conf.d/
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer1 --version=1.10.27 \
-    && curl -sS https://getcomposer.org/download/latest-2.2.x/composer.phar -o /usr/bin/composer2lts \
-    && chmod +x /usr/bin/composer2lts \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer2
+COPY --from=public.ecr.aws/docker/library/composer:1 /usr/bin/composer /usr/bin/composer1
+COPY --from=public.ecr.aws/docker/library/composer:2 /usr/bin/composer /usr/bin/composer2
 
 # If PHP < 8.2
 RUN if [[ $(printf "8.2\n${PHP_VERSION}" | sort -g |head -n1) != "8.2" ]]; \
