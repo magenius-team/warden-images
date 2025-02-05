@@ -10,6 +10,7 @@ RUN arch=$(uname -m) && \
     if [ "$arch" = "aarch64" ]; then arch="arm64"; fi && \
     echo $arch && \
     NODE_FILE=$(curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/ | grep -oE "node-v${NODE_VERSION}\.\d+\.\d+-linux-$arch\.tar\.xz" | head -n 1) && \
+    echo $NODE_FILE && \
     curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE | tar -xJf - -C /usr/local --strip-components=1
 
 # Install global npm packages
