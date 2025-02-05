@@ -112,18 +112,6 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/varnish:${{ matrix.version }}
 
-  delete-versions:
-    name: Delete versions
-    needs: [ varnish ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/delete-package-versions@v5
-        with:
-          package-name: 'varnish'
-          package-type: 'container'
-          min-versions-to-keep: 0
-          delete-only-untagged-versions: 'true'
-
   update-readme:
     name: Update README.md
     needs: [ varnish, varnish-lts ]

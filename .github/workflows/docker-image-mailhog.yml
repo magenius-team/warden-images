@@ -52,15 +52,3 @@ jobs:
           build-args: MAILHOG_VERSION=${{ matrix.version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/mailhog:${{ matrix.version }}
-
-  delete-versions:
-    name: Delete versions
-    needs: [ mailhog ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/delete-package-versions@v5
-        with:
-          package-name: 'mailhog'
-          package-type: 'container'
-          min-versions-to-keep: 0
-          delete-only-untagged-versions: 'true'
