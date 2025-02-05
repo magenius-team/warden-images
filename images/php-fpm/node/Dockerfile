@@ -9,7 +9,8 @@ RUN arch=$(uname -m) && \
     if [ "$arch" = "x86_64" ]; then arch="x64"; fi && \
     if [ "$arch" = "aarch64" ]; then arch="arm64"; fi && \
     echo $arch && \
-    curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/node-v${NODE_VERSION}.x-linux-$arch.tar.xz | tar -xJf - -C /usr/local --strip-components=1
+    NODE_FILE=$(curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/ | grep -oE "node-v${NODE_VERSION}\.\d+\.\d+-linux-$arch\.tar\.xz" | head -n 1) && \
+    curl -fsSL https://nodejs.org/dist/latest-v${NODE_VERSION}.x/$NODE_FILE | tar -xJf - -C /usr/local --strip-components=1
 
 # Install global npm packages
 RUN npm install -g grunt-cli gulp gulp-cli bower yarn
