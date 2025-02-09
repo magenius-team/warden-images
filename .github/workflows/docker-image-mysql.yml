@@ -47,21 +47,11 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - name: Set build-args
-        run: |-
-          ESCAPED_VERSION="$(echo ${{ matrix.version }} | sed 's/\./\\\./g')"
-          MYSQL_VERSION=$(
-            curl -s curl -s https://hub.docker.com/v2/repositories/library/mysql/tags/?page_size=200 \
-            | jq -r '.results[].name' \
-            | egrep "^${ESCAPED_VERSION}(\.[0-9]+)?(\.[0-9]+)?(-oracle)?\$" | sort -Vr | head -n1
-          )
-          echo "MYSQL_VERSION=${MYSQL_VERSION}" | tee /dev/stderr >> $GITHUB_ENV
-
       - uses: docker/build-push-action@v6
         with:
           context: images/mysql
           platforms: linux/amd64,linux/arm64
-          build-args: MYSQL_VERSION=${{ env.MYSQL_VERSION }}
+          build-args: MYSQL_VERSION=${{ matrix.version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
           tags: ghcr.io/${{ github.repository_owner }}/mysql:${{ matrix.version }}
 
