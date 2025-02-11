@@ -1,9 +1,23 @@
 #!/bin/bash
 set -e
 
+# Set MAIL_SERVICE_APP based on environment variable
+case "${WARDEN_MAIL_SERVICE}" in
+  mailhog)
+    export MAIL_SERVICE_APP=mhsendmail
+    ;;
+  mailpit)
+    export MAIL_SERVICE_APP=mpsendmail
+    ;;
+  *)
+    echo "Unknown MAIL_SERVICE: ${MAIL_SERVICE}"
+    exit 1
+    ;;
+esac
+
 # configure php additions.ini
 cat /usr/local/etc/php/conf.d/05-additions.ini.template \
-  | envsubst '${MAILHOG_HOST} ${MAILHOG_PORT}' \
+  | envsubst '${MAIL_SERVICE_APP} ${MAIL_SERVICE_HOST} ${MAIL_SERVICE_PORT}' \
   | sudo tee /usr/local/etc/php/conf.d/05-additions.ini
 
 # append warden issued root ca cert to ca-bundle trusted by curl/openssl

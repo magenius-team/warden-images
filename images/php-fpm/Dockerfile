@@ -4,18 +4,22 @@ ARG PHP_VERSION
 FROM public.ecr.aws/docker/library/golang:alpine AS mhs-builder
 RUN go install github.com/mailhog/mhsendmail@latest
 
+FROM public.ecr.aws/docker/library/golang:alpine AS mps-builder
+RUN go install github.com/axllent/mailpit/sendmail@latest
+
 FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
 USER root
 ARG PHP_VERSION
 
-ENV MAILHOG_HOST=mailhog
-ENV MAILHOG_PORT=1025
+ENV MAIL_SERVICE_HOST=mailhog
+ENV MAIL_SERVICE_PORT=1025
 
 # PHP Extension Installer
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
-# Copy mhsendmail to PHP
+# Copy sendmail service to PHP
 COPY --from=mhs-builder /go/bin/mhsendmail /usr/local/bin/mhsendmail
+COPY --from=mps-builder /go/bin/sendmail /usr/local/bin/mpsendmail
 
 # Install PHP Extensions required by Magento OS, Adobe Commerce, and the UCT (pcntl)
 RUN install-php-extensions \
@@ -78,6 +82,7 @@ COPY etc/php.d/05-additions.ini.template /usr/local/etc/php/conf.d/
 
 # Install Composer
 COPY --from=public.ecr.aws/docker/library/composer:1 /usr/bin/composer /usr/bin/composer1
+COPY --from=public.ecr.aws/docker/library/composer:2.2 /usr/bin/composer /usr/bin/composer2lts
 COPY --from=public.ecr.aws/docker/library/composer:2 /usr/bin/composer /usr/bin/composer2
 
 # If PHP < 8.2
