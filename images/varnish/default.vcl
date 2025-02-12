@@ -1,3 +1,4 @@
+# VCL version 5.0 is not supported so it should be 4.0 even though actually used Varnish version is 6
 vcl 4.0;
 
 import std;
@@ -15,6 +16,10 @@ acl purge {
 }
 
 sub vcl_recv {
+    if (req.restarts > 0) {
+        set req.hash_always_miss = true;
+    }
+
     if (req.method == "PURGE") {
         if (client.ip !~ purge) {
             return (synth(405, "Method not allowed"));
@@ -65,15 +70,18 @@ sub vcl_recv {
         return (pass);
     }
 
-    # Bypass customer, shopping cart, checkout and search requests
-    if (req.url ~ "/customer" || req.url ~ "/checkout" || req.url ~ "/catalogsearch") {
+    # Bypass customer, shopping cart, checkout
+    if (req.url ~ "/customer" || req.url ~ "/checkout") {
         return (pass);
     }
 
     # Bypass health check requests
-    if (req.url ~ "^/(pub/)?(health_check.php|health.php)$") {
+    if (req.url ~ "^/(pub/)?(health_check.php)$") {
         return (pass);
     }
+
+    # Set initial grace period usage status
+    set req.http.grace = "none";
 
     # normalize url in case of leading HTTP scheme and domain
     set req.url = regsub(req.url, "^http[s]?://", "");
@@ -81,24 +89,9 @@ sub vcl_recv {
     # collect all cookies
     std.collect(req.http.Cookie);
 
-    # Compression filter. See https://www.varnish-cache.org/trac/wiki/FAQ/Compression
-    if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|jpeg|png|gif|gz|tgz|bz2|tbz|mp3|ogg|swf|flv)$") {
-            # No point in compressing these
-            unset req.http.Accept-Encoding;
-        } elsif (req.http.Accept-Encoding ~ "gzip") {
-            set req.http.Accept-Encoding = "gzip";
-        } elsif (req.http.Accept-Encoding ~ "deflate" && req.http.user-agent !~ "MSIE") {
-            set req.http.Accept-Encoding = "deflate";
-        } else {
-            # unknown algorithm
-            unset req.http.Accept-Encoding;
-        }
-    }
-
     # Remove all marketing get parameters to minimize the cache objects
-    if (req.url ~ "(\?|&)(gclid|cx|ie|cof|siteurl|zanpid|origin|fbclid|mc_[a-z]+|utm_[a-z]+|_bta_[a-z]+)=") {
-        set req.url = regsuball(req.url, "(gclid|cx|ie|cof|siteurl|zanpid|origin|fbclid|mc_[a-z]+|utm_[a-z]+|_bta_[a-z]+)=[-_A-z0-9+()%.]+&?", "");
+    if (req.url ~ "(\?|&)(gad_source|gbraid|wbraid|_gl|dclid|gclsrc|srsltid|msclkid|gclid|cx|_kx|ie|cof|siteurl|zanpid|origin|fbclid|mc_[a-z]+|utm_[a-z]+|_bta_[a-z]+)=") {
+        set req.url = regsuball(req.url, "(gad_source|gbraid|wbraid|_gl|dclid|gclsrc|srsltid|msclkid|gclid|cx|_kx|ie|cof|siteurl|zanpid|origin|fbclid|mc_[a-z]+|utm_[a-z]+|_bta_[a-z]+)=[-_A-z0-9+()%.]+&?", "");
         set req.url = regsub(req.url, "[?|&]+$", "");
     }
 
@@ -106,6 +99,11 @@ sub vcl_recv {
     if (req.url ~ "^/(pub/)?(media|static)/") {
         # Static files should not be cached by default
         return (pass);
+
+        # But if you use a few locales and don't use CDN you can enable caching static files by commenting previous line (#return (pass);) and uncommenting next 3 lines
+        #unset req.http.Https;
+        #unset req.http./* {{ ssl_offloaded_header }} */;
+        #unset req.http.Cookie;
     }
 
     # Bypass authenticated GraphQL requests without a X-Magento-Cache-Id
@@ -121,7 +119,7 @@ sub vcl_hash {
         hash_data(regsub(req.http.cookie, "^.*?X-Magento-Vary=([^;]+);*.*$", "\1"));
     }
 
-    # Cache AJAX replies seperately than non-AJAX
+    # Cache AJAX replies separately than non-AJAX
     if (req.http.X-Requested-With) {
         hash_data(req.http.X-Requested-With);
     }
@@ -156,6 +154,9 @@ sub process_graphql_headers {
 }
 
 sub vcl_backend_response {
+
+    set beresp.grace = 3d;
+
     if (beresp.http.content-type ~ "text") {
         set beresp.do_esi = true;
     }
@@ -169,9 +170,7 @@ sub vcl_backend_response {
     }
 
     # cache only successfully responses and 404s that are not marked as private
-    if (beresp.status != 200 &&
-            beresp.status != 404 &&
-            beresp.http.Cache-Control ~ "private") {
+    if ((beresp.status != 200 && beresp.status != 404) || beresp.http.Cache-Control ~ "private") {
         set beresp.uncacheable = true;
         set beresp.ttl = 86400s;
         return (deliver);
@@ -179,42 +178,87 @@ sub vcl_backend_response {
 
     # validate if we need to cache it and prevent from setting cookie
     if (beresp.ttl > 0s && (bereq.method == "GET" || bereq.method == "HEAD")) {
+        # Collapse beresp.http.set-cookie in order to merge multiple set-cookie headers
+        # Although it is not recommended to collapse set-cookie header,
+        # it is safe to do it here as the set-cookie header is removed below
+        std.collect(beresp.http.set-cookie);
+        # Do not cache the response under current cache key (hash),
+        # if the response has X-Magento-Vary but the request does not.
+        if ((bereq.url !~ "/graphql" || !bereq.http.X-Magento-Cache-Id)
+         && bereq.http.cookie !~ "X-Magento-Vary="
+         && beresp.http.set-cookie ~ "X-Magento-Vary=") {
+           set beresp.ttl = 0s;
+           set beresp.uncacheable = true;
+        }
         unset beresp.http.set-cookie;
     }
 
-   # If page is not cacheable then bypass varnish for 2 minutes as Hit-For-Pass
-   if (beresp.ttl <= 0s ||
-       beresp.http.Surrogate-control ~ "no-store" ||
-       (!beresp.http.Surrogate-Control &&
-       beresp.http.Cache-Control ~ "no-cache|no-store") ||
-       beresp.http.Vary == "*") {
+    # If page is not cacheable then bypass varnish for 2 minutes as Hit-For-Pass
+    if (beresp.ttl <= 0s ||
+        beresp.http.Surrogate-control ~ "no-store" ||
+        (!beresp.http.Surrogate-Control &&
+        beresp.http.Cache-Control ~ "no-cache|no-store") ||
+        beresp.http.Vary == "*") {
         # Mark as Hit-For-Pass for the next 2 minutes
         set beresp.ttl = 120s;
         set beresp.uncacheable = true;
-   }
+    }
 
-   # If the cache key in the Magento response doesn't match the one that was sent in the request, don't cache under the request's key
-   if (bereq.url ~ "/graphql" && bereq.http.X-Magento-Cache-Id && bereq.http.X-Magento-Cache-Id != beresp.http.X-Magento-Cache-Id) {
-      set beresp.ttl = 0s;
-      set beresp.uncacheable = true;
-   }
+    # If the cache key in the Magento response doesn't match the one that was sent in the request, don't cache under the request's key
+    if (bereq.url ~ "/graphql" && bereq.http.X-Magento-Cache-Id && bereq.http.X-Magento-Cache-Id != beresp.http.X-Magento-Cache-Id) {
+        set beresp.ttl = 0s;
+        set beresp.uncacheable = true;
+    }
 
     return (deliver);
 }
 
 sub vcl_deliver {
-    # Always include hit/miss information in response
-    if (resp.http.x-varnish ~ " ") {
-        set resp.http.X-Cache = "HIT";
+    if (obj.uncacheable) {
+        set resp.http.X-Magento-Cache-Debug = "UNCACHEABLE";
+    } else if (obj.hits) {
+        set resp.http.X-Magento-Cache-Debug = "HIT";
+        set resp.http.Grace = req.http.grace;
     } else {
-        set resp.http.X-Cache = "MISS";
+        set resp.http.X-Magento-Cache-Debug = "MISS";
     }
-    set resp.http.X-Cache-Hits = obj.hits;
 
     # Not letting browser to cache non-static files.
     if (resp.http.Cache-Control !~ "private" && req.url !~ "^/(pub/)?(media|static)/") {
         set resp.http.Pragma = "no-cache";
         set resp.http.Expires = "-1";
         set resp.http.Cache-Control = "no-store, no-cache, must-revalidate, max-age=0";
+    }
+
+    if (!resp.http.X-Magento-Debug) {
+        unset resp.http.Age;
+    }
+    unset resp.http.X-Magento-Debug;
+    unset resp.http.X-Magento-Tags;
+    unset resp.http.X-Powered-By;
+    unset resp.http.Server;
+    unset resp.http.X-Varnish;
+    unset resp.http.Via;
+    unset resp.http.Link;
+}
+
+sub vcl_hit {
+    if (obj.ttl >= 0s) {
+        # Hit within TTL period
+        return (deliver);
+    }
+    if (std.healthy(req.backend_hint)) {
+        if (obj.ttl + /* {{ grace_period }} */s > 0s) {
+            # Hit after TTL expiration, but within grace period
+            set req.http.grace = "normal (healthy server)";
+            return (deliver);
+        } else {
+            # Hit after TTL and grace expiration
+            return (restart);
+        }
+    } else {
+        # server is not healthy, retrieve from cache
+        set req.http.grace = "unlimited (unhealthy server)";
+        return (deliver);
     }
 }
