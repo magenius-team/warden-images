@@ -248,7 +248,7 @@ sub vcl_hit {
         return (deliver);
     }
     if (std.healthy(req.backend_hint)) {
-        if (obj.ttl + /* {{ grace_period }} */s > 0s) {
+        if (obj.ttl + 300s > 0s) {
             # Hit after TTL expiration, but within grace period
             set req.http.grace = "normal (healthy server)";
             return (deliver);
