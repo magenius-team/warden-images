@@ -1,9 +1,9 @@
-# VCL version 5.0 is not supported so it should be 4.0 even though actually used Varnish version is 6
+# VCL version 5.0 is not supported so it should be 4.0 even though actually used Varnish version is 6 or 7
 vcl 4.0;
 
 import std;
-# The minimal Varnish version is 6.0
-
+# The minimal Varnish version is 6.0 or 7.0
+# For SSL offloading, pass the following header in your proxy server or load balancer: 'X-Forwarded-Proto: https'
 backend default {
     .host = "${BACKEND_HOST}";
     .port = "${BACKEND_PORT}";
@@ -75,6 +75,15 @@ sub vcl_recv {
         return (pass);
     }
 
+    #  Cache campaign pages properly
+    if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|utm_content|gclid|cx|ie|cof|siteurl)=") {
+      set req.url = regsuball(req.url, "&(utm_source|utm_medium|utm_campaign|utm_content|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "");
+      set req.url = regsuball(req.url, "\?(utm_source|utm_medium|utm_campaign|utm_content|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "?");
+      set req.url = regsub(req.url, "\?&", "?");
+      set req.url = regsub(req.url, "\?$", "");
+    }
+
+
     # Bypass health check requests
     if (req.url ~ "^/(pub/)?(health_check.php)$") {
         return (pass);
@@ -89,6 +98,21 @@ sub vcl_recv {
     # collect all cookies
     std.collect(req.http.Cookie);
 
+    # Compression filter. See https://www.varnish-cache.org/trac/wiki/FAQ/Compression
+    if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|jpeg|png|gif|gz|tgz|bz2|tbz|mp3|ogg|swf|flv)$") {
+            # No point in compressing these
+            unset req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate" && req.http.user-agent !~ "MSIE") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            # unknown algorithm
+            unset req.http.Accept-Encoding;
+        }
+    }
+
     # Remove all marketing get parameters to minimize the cache objects
     if (req.url ~ "(\?|&)(gad_source|gbraid|wbraid|_gl|dclid|gclsrc|srsltid|msclkid|gclid|cx|_kx|ie|cof|siteurl|zanpid|origin|fbclid|mc_[a-z]+|utm_[a-z]+|_bta_[a-z]+)=") {
         set req.url = regsuball(req.url, "(gad_source|gbraid|wbraid|_gl|dclid|gclsrc|srsltid|msclkid|gclid|cx|_kx|ie|cof|siteurl|zanpid|origin|fbclid|mc_[a-z]+|utm_[a-z]+|_bta_[a-z]+)=[-_A-z0-9+()%.]+&?", "");
@@ -102,7 +126,7 @@ sub vcl_recv {
 
         # But if you use a few locales and don't use CDN you can enable caching static files by commenting previous line (#return (pass);) and uncommenting next 3 lines
         #unset req.http.Https;
-        #unset req.http./* {{ ssl_offloaded_header }} */;
+        #unset req.http.X-Forwarded-Proto;
         #unset req.http.Cookie;
     }
 
@@ -119,6 +143,13 @@ sub vcl_hash {
         hash_data(regsub(req.http.cookie, "^.*?X-Magento-Vary=([^;]+);*.*$", "\1"));
     }
 
+    # For multi site configurations to not cache each other's content
+    if (req.http.host) {
+        hash_data(req.http.host);
+    } else {
+        hash_data(server.ip);
+    }
+
     # Cache AJAX replies separately than non-AJAX
     if (req.http.X-Requested-With) {
         hash_data(req.http.X-Requested-With);
@@ -132,6 +163,12 @@ sub vcl_hash {
     if (req.url ~ "/graphql") {
         call process_graphql_headers;
     }
+
+
+    # Strip out Google Analytics campaign variables
+    # They are only needed by the javascript running on the page
+    # utm_source, utm_medium, utm_campaign, gclid, …
+    hash_data(regsub(regsuball(req.url, "(vid|ef_id|gclid|kw|cof|siteurl|zanpid|origin|emst|sc_[a-z]+|utm_[a-z]+|mr:[A-z]+)=[%@\.\-\:\+_A-z0–9]+&?", ""), "(\?&|\?|&)$", ""));
 }
 
 sub process_graphql_headers {
