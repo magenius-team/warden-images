@@ -6,7 +6,7 @@ This repository contain image build configurations used in MAgenius fork of [War
 
 |Service                  | Versions                                                                                                             |
 |:------------------------|:---------------------------------------------------------------------------------------------------------------------|
-| Varnish                 | 6.0, 7.6 |
+| Varnish                 | 6.0, 7.0, 7.3, 7.5, 7.6 |
 | Redis                   | 6.2, 7.2, 7.4 |
 | RabbitMQ                | 3.7, 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 4.0 |
 | PHP + XDebug3 + PHP-SPX | 7.4, 8.0, 8.1, 8.2, 8.3                                                                                              |
