@@ -25,10 +25,10 @@ COPY etc/nginx/fastcgi-params.sh /usr/local/bin/fastcgi-params.sh
 RUN chmod +x /usr/local/bin/fastcgi-params.sh
 
 CMD envsubst '${NGINX_UPSTREAM_HOST} ${NGINX_UPSTREAM_PORT} \
-              ${NGINX_UPSTREAM_BLACKFIRE_HOST} ${NGINX_UPSTREAM_BLACKFIRE_PORT} \
               ${NGINX_UPSTREAM_DEBUG_HOST} ${NGINX_UPSTREAM_DEBUG_PORT} \
-              ${NGINX_UPSTREAM_SPX_HOST} ${NGINX_UPSTREAM_SPX_PORT} \
               ${NGINX_UPSTREAM_XHPROF_HOST} ${NGINX_UPSTREAM_XHPROF_PORT} \
+              ${NGINX_UPSTREAM_SPX_HOST} ${NGINX_UPSTREAM_SPX_PORT} \
+              ${NGINX_UPSTREAM_BLACKFIRE_HOST} ${NGINX_UPSTREAM_BLACKFIRE_PORT} \
               ${NGINX_ROOT} ${NGINX_PUBLIC} ${NGINX_TEMPLATE}' \
         < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf \
     && envsubst '${XDEBUG_CONNECT_BACK_HOST}' \
