@@ -3,7 +3,9 @@ if (extension_loaded('xhprof')) {
     $xhprofData = xhprof_disable();
     $data = json_encode([
         'profile' => $xhprofData,
-        'tags' => [],
+        'tags' => [
+            'url' => $_SERVER['REQUEST_URI']
+        ],
         'app_name' => getenv('WARDEN_ENV_NAME'),
         'hostname' => gethostname(),
         'date' => (new DateTimeImmutable())->getTimestamp()
