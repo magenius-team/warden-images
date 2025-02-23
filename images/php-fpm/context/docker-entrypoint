@@ -7,14 +7,15 @@ if [ -n "${WARDEN_MAIL_SERVICE}" ]; then
     mailhog)
       export MAIL_SERVICE_APP=mhsendmail
       ;;
-    mailpit)
+    # use mailpit service app for mailpit and buggregator
+    mailpit|buggregator)
       export MAIL_SERVICE_APP=mpsendmail
       ;;
   esac
 
   # configure php additions.ini
   cat /usr/local/etc/php/conf.d/05-additions.ini.template \
-    | envsubst '${MAIL_SERVICE_APP} ${MAIL_SERVICE_HOST} ${MAIL_SERVICE_PORT}' \
+    | envsubst '${MAIL_SERVICE_APP} ${WARDEN_MAIL_SERVICE} ${MAIL_SERVICE_PORT}' \
     | sudo tee /usr/local/etc/php/conf.d/05-additions.ini
 fi
 

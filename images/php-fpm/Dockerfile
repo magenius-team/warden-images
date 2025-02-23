@@ -11,7 +11,6 @@ FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
 USER root
 ARG PHP_VERSION
 
-ENV MAIL_SERVICE_HOST=mailhog
 ENV MAIL_SERVICE_PORT=1025
 
 # PHP Extension Installer
