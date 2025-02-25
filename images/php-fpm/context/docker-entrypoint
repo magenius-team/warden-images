@@ -70,6 +70,13 @@ done
 # surfaces would cause mutagen sync failures (on initial startup) on macOS environments.
 sudo chown www-data:www-data /var/www/html
 
+# Create a named pipe and read from it if WARDEN_MONOLOG is present
+if [ -n "${MONOLOG_PIPE_SERVER}" ]; then
+  rm -f /tmp/buggregator.log
+  mkfifo /tmp/buggregator.log
+  tail -f /tmp/buggregator.log | nohup socat - TCP:${MONOLOG_PIPE_SERVER} &
+fi
+
 # first arg is `-f` or `--some-option`
 if [ "${1#-}" != "$1" ]; then
   set -- php-fpm "$@"
