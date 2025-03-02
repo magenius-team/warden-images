@@ -82,7 +82,9 @@ COPY etc/php.d/05-additions.ini.template /usr/local/etc/php/conf.d/
 
 # Install Composer
 COPY --from=public.ecr.aws/docker/library/composer:1 /usr/bin/composer /usr/bin/composer1
+RUN sleep 5
 COPY --from=public.ecr.aws/docker/library/composer:2.2 /usr/bin/composer /usr/bin/composer2lts
+RUN sleep 5
 COPY --from=public.ecr.aws/docker/library/composer:2 /usr/bin/composer /usr/bin/composer2
 
 # If PHP < 8.2
