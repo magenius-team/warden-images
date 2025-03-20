@@ -27,6 +27,7 @@ RUN install-php-extensions \
     bcmath \
     calendar \
     exif \
+    ftp \
     gd \
     intl \
     imap \
