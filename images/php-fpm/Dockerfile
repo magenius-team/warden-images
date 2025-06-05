@@ -1,11 +1,10 @@
 ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 
-FROM public.ecr.aws/docker/library/golang:1.23-alpine AS mhs-builder
+FROM public.ecr.aws/docker/library/golang:alpine AS mhs-builder
 RUN go install github.com/mailhog/mhsendmail@latest
 
-FROM public.ecr.aws/docker/library/golang:1.23-alpine AS mps-builder
-RUN go install github.com/axllent/mailpit/sendmail@latest
+FROM axllent/mailpit:latest AS mps-builder
 
 FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
 USER root
@@ -18,7 +17,7 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 
 # Copy sendmail service to PHP
 COPY --from=mhs-builder /go/bin/mhsendmail /usr/local/bin/mhsendmail
-COPY --from=mps-builder /go/bin/sendmail /usr/local/bin/mpsendmail
+COPY --from=mps-builder /mailpit /usr/local/bin/mpsendmail
 
 # Install PHP Extensions required by Magento OS, Adobe Commerce, and the UCT (pcntl)
 RUN install-php-extensions \
