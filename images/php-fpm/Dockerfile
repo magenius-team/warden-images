@@ -1,10 +1,10 @@
 ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 
-FROM public.ecr.aws/docker/library/golang:alpine AS mhs-builder
+FROM public.ecr.aws/docker/library/golang:1.23-alpine AS mhs-builder
 RUN go install github.com/mailhog/mhsendmail@latest
 
-FROM public.ecr.aws/docker/library/golang:alpine AS mps-builder
+FROM public.ecr.aws/docker/library/golang:1.23-alpine AS mps-builder
 RUN go install github.com/axllent/mailpit/sendmail@latest
 
 FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
