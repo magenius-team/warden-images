@@ -1,0 +1,2 @@
+ARG VALKEY_VERSION
+FROM valkey/valkey:${VALKEY_VERSION}-alpine
