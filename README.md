@@ -9,7 +9,7 @@ This repository contain image build configurations used in MAgenius fork of [War
 | Varnish                 | 6.0, 7.0, 7.3, 7.5, 7.6                                                                                                    |
 | Redis                   | 6.2, 7.2, 7.4                                                                                                              |
 | Valkey                  | 8.0, 8.1 |
-| RabbitMQ                | 3.12, 3.13, 4.0                                                                                                            |
+| RabbitMQ                | 3.12, 3.13, 4.0 |
 | PHP + XDebug3 + PHP-SPX | 7.4, 8.0, 8.1, 8.2, 8.3                                                                                                    |
 | Node JS                 | 10, 12, 13, 14, 15, 16, 17, 18, 19, 20                                                                                     |
 | Elasticsearch           | 7.17, 8.13                                                                                                                 |
