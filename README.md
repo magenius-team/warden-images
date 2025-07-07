@@ -12,7 +12,7 @@ This repository contain image build configurations used in MAgenius fork of [War
 | RabbitMQ                | 3.12, 3.13, 4.0 |
 | PHP + XDebug3 + PHP-SPX | 7.4, 8.0, 8.1, 8.2, 8.3                                                                                                    |
 | Node JS                 | 10, 12, 13, 14, 15, 16, 17, 18, 19, 20                                                                                     |
-| Elasticsearch           | 7.17, 8.13                                                                                                                 |
+| Elasticsearch           | 7.17, 8.13 |
 | OpenSearch              | 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.19, 3.0, 3.1 |
 | Nginx                   | 1.25, 1.26, 1.27 |
 | MySQL                   | 8.0, 8.1, 8.2, 8.3, 8.4 |
