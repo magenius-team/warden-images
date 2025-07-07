@@ -80,6 +80,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git pull origin main --rebase
           git add README.md
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "Update RabbitMQ versions in README.md"
