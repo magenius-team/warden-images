@@ -97,7 +97,7 @@ jobs:
   magento1-xdebug3:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3
     runs-on: ${{ matrix.os }}
-    needs: [ magento1 ]
+    needs: [ call-matrix-generator, magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -138,7 +138,7 @@ jobs:
   magento1-xdebug3-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XDebug 3 + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, magento1-node ]
+    needs: [ call-matrix-generator, magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -179,7 +179,7 @@ jobs:
   magento1-xhprof:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XHProf
     runs-on: ${{ matrix.os }}
-    needs: [ magento1 ]
+    needs: [ call-matrix-generator, magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -219,7 +219,7 @@ jobs:
   magento1-xhprof-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + XHProf + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, magento1-node ]
+    needs: [ call-matrix-generator, magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -259,7 +259,7 @@ jobs:
   magento1-spx:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + SPX
     runs-on: ${{ matrix.os }}
-    needs: [ magento1 ]
+    needs: [ call-matrix-generator, magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -299,7 +299,7 @@ jobs:
   magento1-spx-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + SPX + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, magento1-node ]
+    needs: [ call-matrix-generator, magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -339,7 +339,7 @@ jobs:
   magento1-blackfire:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire
     runs-on: ${{ matrix.os }}
-    needs: [ magento1 ]
+    needs: [ call-matrix-generator, magento1 ]
     continue-on-error: false
     strategy:
       fail-fast: false
@@ -379,7 +379,7 @@ jobs:
   magento1-blackfire-node:
     name: Magento 1 PHP-FPM ${{ matrix.php_version }} + Blackfire + Node ${{ matrix.node_version }}
     runs-on: ${{ matrix.os }}
-    needs: [ magento1, magento1-node ]
+    needs: [ call-matrix-generator, magento1, magento1-node ]
     continue-on-error: false
     strategy:
       fail-fast: false
