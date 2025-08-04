@@ -368,7 +368,7 @@ jobs:
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
-          context: images/php-fpm/
+          context: images/php-fpm/context
           platforms: linux/amd64,linux/arm64
           build-args: |
             ENV_SOURCE_IMAGE=ghcr.io/${{ github.repository_owner }}/php-fpm
