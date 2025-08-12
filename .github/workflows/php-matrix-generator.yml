@@ -29,7 +29,7 @@ jobs:
       NODE_VERSIONS: ${{ vars.NODE_VERSIONS }}
       NOT_STABLE_XDEBUG_PHP_VERSIONS: ${{ vars.NOT_STABLE_XDEBUG_PHP_VERSIONS }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: matrix
         run: |
           php .github/workflows/php-matrix/php-generator.php >> $GITHUB_OUTPUT
@@ -50,7 +50,7 @@ jobs:
       NODE_VERSIONS: ${{ vars.NODE_VERSIONS }}
       NOT_STABLE_XDEBUG_PHP_VERSIONS: ${{ vars.NOT_STABLE_XDEBUG_PHP_VERSIONS }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: matrix
         run: |
           php .github/workflows/php-matrix/node-generator.php >> $GITHUB_OUTPUT
@@ -71,7 +71,7 @@ jobs:
       NODE_VERSIONS: ${{ vars.NODE_VERSIONS }}
       NOT_STABLE_XDEBUG_PHP_VERSIONS: ${{ vars.NOT_STABLE_XDEBUG_PHP_VERSIONS }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: matrix
         run: |
           php .github/workflows/php-matrix/full-generator.php >> $GITHUB_OUTPUT
