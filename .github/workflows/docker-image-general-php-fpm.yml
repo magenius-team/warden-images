@@ -22,7 +22,7 @@ jobs:
       max-parallel: 1
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.php-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -63,7 +63,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 6 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.node-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -103,7 +103,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -144,7 +144,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -185,7 +185,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -225,7 +225,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -265,7 +265,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -305,7 +305,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -345,7 +345,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
@@ -385,7 +385,7 @@ jobs:
       max-parallel: ${{ github.ref == 'refs/heads/main' && 2 || 0 }}
       matrix: ${{ fromJson(needs.call-matrix-generator.outputs.full-matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Login to Github Container Registry
