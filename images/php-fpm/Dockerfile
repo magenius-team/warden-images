@@ -86,6 +86,8 @@ RUN if [[ $(printf "8.1\n${PHP_VERSION}" | sort -g | head -n1) != "8.1" ]]; \
     then cp /tmp/php.d/74/*.ini /usr/local/etc/php/conf.d/; \
     else cp /tmp/php.d/8x/*.ini /usr/local/etc/php/conf.d/; fi
 
+RUN rm -rf /tmp/php.d
+
 # Install Composer
 COPY --from=public.ecr.aws/docker/library/composer:1 /usr/bin/composer /usr/bin/composer1
 RUN sleep 5
