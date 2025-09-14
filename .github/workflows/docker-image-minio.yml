@@ -1,0 +1,88 @@
+name: Docker Image Minio
+on:
+  schedule:
+    - cron: "0 3 * * 0" # At 03:00 on Sunday
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - version
+      - images/minio/**
+
+jobs:
+  build-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo "matrix=${{ vars.MINIO_MATRIX }}" >> $GITHUB_OUTPUT
+      - run: echo "Matrix:\n";echo '${{ steps.set-matrix.outputs.matrix }}'
+
+  minio:
+    needs: build-matrix
+    name: Minio
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.build-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          build-args: MINIO_VERSION=${{ matrix.version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/minio:${{ matrix.version }}
+
+  update-readme:
+    needs: [ minio ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Update README.md
+        run: node .github/workflows/actions/readme-update.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PACKAGE_NAME: Minio
+
+      - name: Commit changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Update Minio versions in README.md"
+            git pull origin main --rebase
+            git push
+          else
+            echo "No changes to commit"
+          fi
