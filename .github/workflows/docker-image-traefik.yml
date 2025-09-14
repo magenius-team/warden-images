@@ -49,6 +49,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
+          context: images/traefik
           platforms: linux/amd64,linux/arm64
           build-args: TRAEFIK_VERSION=${{ matrix.version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
