@@ -19,7 +19,7 @@ This repository contain image build configurations used in Magenius fork of [War
 | MariaDB                 | 10.5, 10.6, 10.11, 11.4, 11.5, 11.6 |
 | Magepack                | 2.11 |
 | Traefik                 | 3.5 |
-| Minio                   | latest                                                                                                                     |
+| Minio                   |  |
 
 ## License
 
