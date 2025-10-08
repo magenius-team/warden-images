@@ -1,7 +1,7 @@
 #!/bin/bash
 
 IFS='|' read -ra PARAMS <<< "$FASTCGI_PARAMS"
-for i in "${PARAMS[@]}"; do
+for item in "${PARAMS[@]}"; do
     IFS='=' read -r KEY VALUE <<< "$item"
     VALUE=${VALUE//\"/\\\"}
     # Add the fastcgi_param line to the fastcgi_params file
