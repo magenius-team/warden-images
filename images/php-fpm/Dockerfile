@@ -88,10 +88,6 @@ RUN if [[ $(printf "8.1\n${PHP_VERSION}" | sort -g | head -n1) != "8.1" ]]; \
 
 RUN rm -rf /tmp/php.d
 
-# Add runs
-RUN mkdir -p /usr/local/etc/php/runs/
-COPY etc/runs/* /usr/local/etc/php/runs/
-
 # Install Composer
 COPY --from=public.ecr.aws/docker/library/composer:1 /usr/bin/composer /usr/bin/composer1
 RUN sleep 5

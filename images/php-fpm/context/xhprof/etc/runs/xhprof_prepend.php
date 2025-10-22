@@ -1,5 +1,4 @@
 <?php
-require '/usr/local/etc/php/runs/prepend.php';
 
 if (extension_loaded('xhprof')) {
     xhprof_enable(
