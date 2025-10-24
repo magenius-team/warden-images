@@ -1,4 +1,4 @@
-package main
+package traefik_csp_merge
 
 import (
 	"context"
