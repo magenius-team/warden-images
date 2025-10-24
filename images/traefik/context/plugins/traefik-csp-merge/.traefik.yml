@@ -1,0 +1,15 @@
+displayName: CSP Merge
+type: middleware
+import: github.com/magenius-team/traefik-csp-merge
+summary: "Merges extra sources into existing Content-Security-Policy* headers."
+testData:
+  domains:
+    - "*.test"
+  directives:
+    - default-src
+    - script-src
+    - style-src
+    - img-src
+    - font-src
+    - connect-src
+    - media-src
