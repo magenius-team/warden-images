@@ -89,11 +89,12 @@ RUN if [[ $(printf "8.1\n${PHP_VERSION}" | sort -g | head -n1) != "8.1" ]]; \
 RUN rm -rf /tmp/php.d
 
 # Install Composer
-COPY --from=public.ecr.aws/docker/library/composer:1 /usr/bin/composer /usr/bin/composer1
-RUN sleep 5
-COPY --from=public.ecr.aws/docker/library/composer:2.2 /usr/bin/composer /usr/bin/composer2lts
-RUN sleep 5
-COPY --from=public.ecr.aws/docker/library/composer:2 /usr/bin/composer /usr/bin/composer2
+RUN curl -sS https://getcomposer.org/download/latest-2.2.x/composer.phar -o /usr/bin/composer2lts \
+    && chmod +x /usr/bin/composer2lts \
+    && curl -sS https://getcomposer.org/download/latest-2.x/composer.phar -o /usr/bin/composer2 \
+    && chmod +x /usr/bin/composer2 \
+    && curl -sS https://getcomposer.org/download/1.10.27/composer.phar -o /usr/bin/composer1 \
+    && chmod +x /usr/bin/composer1
 
 # If PHP < 8.2
 RUN if [[ $(printf "8.2\n${PHP_VERSION}" | sort -g | head -n1) != "8.2" ]]; \
