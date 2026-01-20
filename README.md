@@ -6,7 +6,7 @@ This repository contain image build configurations used in Magenius fork of [War
 
 | Service                 | Versions                                                                                                                   |
 |:------------------------|:---------------------------------------------------------------------------------------------------------------------------|
-| Varnish                 | 6.0, 7.0, 7.3, 7.5, 7.6 |
+| Varnish                 | 6.0, 7.0, 7.3, 7.5, 7.6, 7.7, 8.0 |
 | Redis                   | 6.2, 7.2, 7.4 |
 | Valkey                  | 8.0, 8.1 |
 | RabbitMQ                | 3.12, 3.13, 4.0 |
