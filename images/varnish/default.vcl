@@ -60,8 +60,24 @@ sub vcl_recv {
         }
     }
 
+    # Remove SPX cookies to avoid cache fragmentation
+    if (req.http.Cookie ~ "(^|;\s*)SPX_ENABLED=0(;|$)") {
+        set req.http.Cookie = regsuball(
+            req.http.Cookie,
+            "(^|;\s*)SPX_[^=]+=[^;]*",
+            ""
+        );
+        set req.http.Cookie = regsuball(
+            req.http.Cookie,
+            "^\s*;\s*|\s*;\s*$",
+            ""
+        );
+    }
+
     # Do not handle requests going through SPX
-    if (req.http.Cookie ~ "SPX_ENABLED" || req.http.Cookie ~ "SPX_KEY" || req.url ~ "(?i)(\?|\&)SPX_UI_URI=" || req.url ~ "(?i)(\?|\&)SPX_KEY=") {
+    if (req.http.Cookie ~ "(^|;\s*)SPX_ENABLED=1(;|$)" ||
+        req.url ~ "(?i)(\?|\&)SPX_UI_URI=" ||
+        req.url ~ "(?i)(\?|\&)SPX_KEY=") {
         return (pass);
     }
 
@@ -194,8 +210,10 @@ sub vcl_backend_response {
 
     set beresp.grace = 3d;
 
-    if (beresp.http.content-type ~ "text") {
+    if (beresp.http.Content-Type ~ "text/html") {
         set beresp.do_esi = true;
+    } else {
+        set beresp.do_esi = false;
     }
 
     if (bereq.url ~ "\.js$" || beresp.http.content-type ~ "text") {
