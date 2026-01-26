@@ -1,7 +1,7 @@
 name: Docker Image Magento 2 PHP-FPM
 on:
   schedule:
-    - cron: "0 3 * * 0" # At 03:00 on Sunday
+    - cron: "0 3 1,15 * *" # At 03:00 on day-of-month 1 and 15.
   workflow_dispatch:
   push:
     branches:
