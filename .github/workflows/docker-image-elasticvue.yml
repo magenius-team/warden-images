@@ -1,4 +1,4 @@
-name: Docker Image Redis
+name: Docker Image Elasticvue
 on:
   schedule:
     - cron: "0 3 * * 0" # At 03:00 on Sunday
