@@ -1,4 +1,4 @@
-name: Docker Image Minio
+name: Docker Image Redis
 on:
   schedule:
     - cron: "0 3 * * 0" # At 03:00 on Sunday
@@ -8,7 +8,7 @@ on:
       - 'main'
     paths:
       - version
-      - images/minio/**
+      - images/elasticvue/**
 
 jobs:
   build-matrix:
@@ -17,12 +17,12 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
-        run: echo "matrix=${{ vars.MINIO_MATRIX }}" >> $GITHUB_OUTPUT
+        run: echo "matrix=${{ vars.ELASTICVUE_MATRIX }}" >> $GITHUB_OUTPUT
       - run: echo "Matrix:\n";echo '${{ steps.set-matrix.outputs.matrix }}'
 
-  minio:
+  elasticvue:
     needs: build-matrix
-    name: Minio
+    name: Elasticvue
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -49,8 +49,8 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: images/minio
+          context: images/elasticvue
           platforms: linux/amd64,linux/arm64
-          build-args: MINIO_VERSION=${{ matrix.version }}
+          build-args: ELASTICVUE_VERSION=${{ matrix.version }}
           push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
-          tags: ghcr.io/${{ github.repository_owner }}/minio:${{ matrix.version }}
+          tags: ghcr.io/${{ github.repository_owner }}/elasticvue:${{ matrix.version }}
