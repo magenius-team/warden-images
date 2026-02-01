@@ -18,7 +18,7 @@ This repository contain image build configurations used in Magenius fork of [War
 | MySQL                   | 8.0, 8.1, 8.2, 8.3, 8.4 |
 | MariaDB                 | 10.5, 10.6, 10.11, 11.4, 11.5, 11.6 |
 | Magepack                | 2.11                                                                                                                                      |
-| Traefik                 | 3.5, 3.6                                                                                                                                  |
+| Traefik                 | 3.5, 3.6 |
 | Minio                   | latest                                                                                                                                    |
 | Elasticvue              | latest                                                                                                                                    |
 
