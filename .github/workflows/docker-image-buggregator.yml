@@ -1,0 +1,113 @@
+name: Docker Image Buggregator
+on:
+  schedule:
+    - cron: "0 3 * * 0" # At 03:00 on Sunday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  buggregator:
+    name: Buggregator Mirror
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq skopeo
+
+      - name: Choose newest latest source
+        id: choose-source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          GHCR_SOURCE="ghcr.io/buggregator/server:latest"
+          HUB_SOURCE="docker.io/butschster/buggregator:latest"
+
+          ghcr_json="$(skopeo inspect --retry-times 3 "docker://${GHCR_SOURCE}")"
+          hub_json="$(skopeo inspect --retry-times 3 "docker://${HUB_SOURCE}")"
+
+          ghcr_version="$(echo "${ghcr_json}" | jq -r '.Labels["org.opencontainers.image.version"] // .Labels["version"] // empty')"
+          hub_version="$(echo "${hub_json}" | jq -r '.Labels["org.opencontainers.image.version"] // .Labels["version"] // empty')"
+          ghcr_created="$(echo "${ghcr_json}" | jq -r '.Created // empty')"
+          hub_created="$(echo "${hub_json}" | jq -r '.Created // empty')"
+
+          normalize_version() {
+            echo "${1#v}" | sed 's/[^0-9.].*$//'
+          }
+
+          to_epoch() {
+            local ts="$1"
+            if [ -z "${ts}" ]; then
+              echo "0"
+            else
+              date -u -d "${ts}" +%s 2>/dev/null || echo "0"
+            fi
+          }
+
+          selected_source=""
+          selected_version=""
+
+          if [ -n "${ghcr_version}" ] && [ -n "${hub_version}" ]; then
+            ghcr_norm="$(normalize_version "${ghcr_version}")"
+            hub_norm="$(normalize_version "${hub_version}")"
+            max_norm="$(printf '%s\n%s\n' "${ghcr_norm}" "${hub_norm}" | sort -V | tail -n1)"
+
+            if [ "${max_norm}" = "${ghcr_norm}" ] && [ "${ghcr_norm}" != "${hub_norm}" ]; then
+              selected_source="${GHCR_SOURCE}"
+              selected_version="${ghcr_version}"
+            elif [ "${max_norm}" = "${hub_norm}" ] && [ "${ghcr_norm}" != "${hub_norm}" ]; then
+              selected_source="${HUB_SOURCE}"
+              selected_version="${hub_version}"
+            fi
+          fi
+
+          if [ -z "${selected_source}" ]; then
+            ghcr_epoch="$(to_epoch "${ghcr_created}")"
+            hub_epoch="$(to_epoch "${hub_created}")"
+
+            if [ "${hub_epoch}" -gt "${ghcr_epoch}" ]; then
+              selected_source="${HUB_SOURCE}"
+              selected_version="${hub_version}"
+            else
+              selected_source="${GHCR_SOURCE}"
+              selected_version="${ghcr_version}"
+            fi
+          fi
+
+          echo "Selected source: ${selected_source}"
+          echo "Selected version: ${selected_version:-unknown}"
+          echo "GHCR latest version: ${ghcr_version:-unknown}, created: ${ghcr_created:-unknown}"
+          echo "Docker Hub latest version: ${hub_version:-unknown}, created: ${hub_created:-unknown}"
+
+          echo "source=${selected_source}" >> "${GITHUB_OUTPUT}"
+          echo "version=${selected_version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Copy selected latest to owner GHCR
+        env:
+          SOURCE_IMAGE: ${{ steps.choose-source.outputs.source }}
+          TARGET_IMAGE: ghcr.io/${{ github.repository_owner }}/buggregator:latest
+        run: skopeo copy --all "docker://${SOURCE_IMAGE}" "docker://${TARGET_IMAGE}"
+
+      - name: Copy selected version tag to owner GHCR
+        if: ${{ steps.choose-source.outputs.version != '' }}
+        env:
+          SOURCE_IMAGE: ${{ steps.choose-source.outputs.source }}
+          TARGET_IMAGE: ghcr.io/${{ github.repository_owner }}/buggregator:${{ steps.choose-source.outputs.version }}
+        run: skopeo copy --all "docker://${SOURCE_IMAGE}" "docker://${TARGET_IMAGE}"
