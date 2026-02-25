@@ -57,26 +57,39 @@ async function getTaggedVersionsFromLastPage() {
     }
 }
 
-function escapeRegExp(value) {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function updateReadme(versions) {
     const readmePath = 'README.md';
     const readmeContent = fs.readFileSync(readmePath, 'utf8');
     const versionList = versions.length ? versions.join(', ') : 'latest';
-    const escapedName = escapeRegExp(packageName.trim());
-    const rowPattern = new RegExp(
-        `^(\\|\\s*${escapedName}\\s*\\|\\s*)([^|]*?)(\\s*\\|\\s*.*\\|\\s*)$`,
-        'mi'
-    );
+    const targetName = packageName.trim().toLowerCase();
+    const lines = readmeContent.split('\n');
+    let found = false;
+    const serviceNames = [];
 
-    const updatedContent = readmeContent.replace(rowPattern, `$1${versionList}$3`);
-    if (updatedContent === readmeContent) {
-        throw new Error(`Unable to find README table row for package: ${packageName}`);
+    const updatedLines = lines.map((line) => {
+        const rowMatch = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|(.*)\|?\s*$/);
+        if (!rowMatch) {
+            return line;
+        }
+
+        const serviceName = rowMatch[1].trim();
+        const rest = rowMatch[3];
+        const normalizedServiceName = serviceName.toLowerCase();
+        serviceNames.push(serviceName);
+
+        if (normalizedServiceName !== targetName) {
+            return line;
+        }
+
+        found = true;
+        return `| ${serviceName} | ${versionList} |${rest}|`;
+    });
+
+    if (!found) {
+        throw new Error(`Unable to find README table row for package: ${packageName}. Found services: ${serviceNames.join(', ')}`);
     }
 
-    fs.writeFileSync(readmePath, updatedContent);
+    fs.writeFileSync(readmePath, updatedLines.join('\n'));
 }
 
 (async () => {
