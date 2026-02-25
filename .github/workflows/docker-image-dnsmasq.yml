@@ -10,6 +10,10 @@ on:
       - version
       - images/dnsmasq/**
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   dnsmasq:
     name: DNSMasq

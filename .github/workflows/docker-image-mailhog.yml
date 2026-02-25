@@ -8,6 +8,10 @@ on:
       - version
       - images/mailhog/**
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-matrix:
     runs-on: ubuntu-latest

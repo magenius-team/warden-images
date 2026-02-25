@@ -73,6 +73,7 @@ function updateReadme(versions) {
         }
 
         const serviceName = rowMatch[1].trim();
+        const currentVersions = rowMatch[2].trim();
         const rest = rowMatch[3];
         const normalizedServiceName = serviceName.toLowerCase();
         serviceNames.push(serviceName);
@@ -82,6 +83,10 @@ function updateReadme(versions) {
         }
 
         found = true;
+        if (currentVersions === versionList) {
+            return line;
+        }
+
         return `| ${serviceName} | ${versionList} |${rest}|`;
     });
 
@@ -89,7 +94,15 @@ function updateReadme(versions) {
         throw new Error(`Unable to find README table row for package: ${packageName}. Found services: ${serviceNames.join(', ')}`);
     }
 
-    fs.writeFileSync(readmePath, updatedLines.join('\n'));
+    const updatedContent = updatedLines.join('\n');
+    if (updatedContent === readmeContent) {
+        console.log(`No README changes required for package: ${packageName}`);
+        return false;
+    }
+
+    fs.writeFileSync(readmePath, updatedContent);
+    console.log(`README updated for package: ${packageName}`);
+    return true;
 }
 
 (async () => {

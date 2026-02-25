@@ -10,6 +10,10 @@ on:
       - version
       - images/rabbitmq/**
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-matrix:
     runs-on: ubuntu-latest
@@ -56,35 +60,8 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/rabbitmq:${{ matrix.version }}
 
   update-readme:
-    name: Update README.md
     needs: [ rabbitmq ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install axios
-
-      - name: Update README.md
-        run: node .github/workflows/actions/readme-update.js
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PACKAGE_NAME: RabbitMQ
-
-      - name: Commit changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add README.md
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Update RabbitMQ versions in README.md"
-            git pull origin main --rebase
-            git push
-          else
-            echo "No changes to commit"
-          fi
+    uses: ./.github/workflows/update-readme.yml
+    with:
+      package_name: RabbitMQ
+    secrets: inherit

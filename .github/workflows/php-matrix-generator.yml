@@ -13,6 +13,9 @@ on:
         description: 'Generated full matrix'
         value: ${{ jobs.full-matrix.outputs.matrix }}
 
+permissions:
+  contents: read
+
 jobs:
   php-matrix:
     name: Generate Base PHP Matrix

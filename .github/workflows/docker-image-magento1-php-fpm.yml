@@ -10,6 +10,10 @@ on:
       - version
       - images/php-fpm/magento1/**
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   call-matrix-generator:
     uses: ./.github/workflows/php-matrix-generator.yml
