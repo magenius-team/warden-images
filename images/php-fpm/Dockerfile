@@ -41,10 +41,6 @@ RUN install-php-extensions \
     zip \
     ssh2
 
-# Install Imagick for php < 8.3 only due to issue https://github.com/Imagick/imagick/issues/640
-RUN if [[ "${PHP_VERSION}" != "8.3" ]]; \
-    then install-php-extensions imagick; fi
-
 # Install helpful utilities
 RUN apk --no-cache add \
     jq \
