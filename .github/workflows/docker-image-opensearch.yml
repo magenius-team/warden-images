@@ -1,7 +1,7 @@
 name: Docker Image OpenSearch
 on:
   schedule:
-    - cron: "0 3 1 * *" # At 03:00 on day-of-month 1
+    - cron: "40 4 1 * *" # At 04:40 on day-of-month 1
   workflow_dispatch:
   push:
     branches:

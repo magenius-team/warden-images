@@ -1,7 +1,7 @@
 name: Docker Image Redis
 on:
   schedule:
-    - cron: "0 3 * * 0" # At 03:00 on Sunday
+    - cron: "10 3 * * 0" # At 03:10 on Sunday
   workflow_dispatch:
   push:
     branches:
