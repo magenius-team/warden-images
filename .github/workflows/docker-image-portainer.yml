@@ -1,0 +1,42 @@
+name: Docker Image Portainer
+on:
+  schedule:
+    - cron: "0 3 * * 0" # At 03:00 on Sunday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  portainer:
+    name: Portainer Mirror
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        if: ${{ !env.ACT }}
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y skopeo
+
+      - name: Choose latest source
+        id: choose-source
+        run: echo "source=docker.io/portainer/portainer-ce:alpine" >> "${GITHUB_OUTPUT}"
+
+      - name: Copy selected latest to owner GHCR
+        env:
+          SOURCE_IMAGE: ${{ steps.choose-source.outputs.source }}
+          TARGET_IMAGE: ghcr.io/${{ github.repository_owner }}/portainer-ce:alpine
+        run: skopeo copy --all "docker://${SOURCE_IMAGE}" "docker://${TARGET_IMAGE}"
