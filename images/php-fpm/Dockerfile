@@ -29,6 +29,7 @@ RUN install-php-extensions \
     ftp \
     gd \
     intl \
+    imagick \
     imap \
     mysqli \
     pcntl \
