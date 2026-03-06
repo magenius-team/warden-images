@@ -50,7 +50,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/magento2/Dockerfile
@@ -90,7 +90,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/magento2/Dockerfile
@@ -130,7 +130,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -171,7 +171,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/xdebug3/Dockerfile
@@ -212,7 +212,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/xhprof/Dockerfile
@@ -252,7 +252,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/xhprof/Dockerfile
@@ -292,7 +292,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -332,7 +332,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/spx/Dockerfile
@@ -372,7 +372,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version == 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
@@ -412,7 +412,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
         if: ${{ !env.ACT }}
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         if: ${{ matrix.node_version != 'x' }}
         with:
           file: images/php-fpm/blackfire/Dockerfile
