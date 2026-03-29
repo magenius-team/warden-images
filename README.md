@@ -21,7 +21,7 @@ This repository contain image build configurations used in Magenius fork of [War
 | Traefik                 | 3.5, 3.6 | [![Traefik build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-traefik.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-traefik.yml) |
 | Minio                   | latest | [![Minio build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-minio.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-minio.yml) |
 | Elasticvue              | latest | [![Elasticvue build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-elasticvue.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-elasticvue.yml) |
-| Buggregator | 1.13.7 | [![Buggregator build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-buggregator.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-buggregator.yml) ||
+| Buggregator | 1.13.7, 1.16.0 | [![Buggregator build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-buggregator.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-buggregator.yml) |||
 
 ## License
 
