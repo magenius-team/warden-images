@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+# Preserve user options and propagate system trust to process.execPath children.
+export NODE_OPTIONS="${NODE_OPTIONS:+$NODE_OPTIONS }--use-openssl-ca"
+exec /usr/local/libexec/node --use-openssl-ca "$@"

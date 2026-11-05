@@ -2,6 +2,8 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 
 FROM public.ecr.aws/docker/library/golang:alpine AS mhs-builder
+COPY --chmod=0755 update-ca-trust /usr/local/bin/
+RUN update-ca-trust
 RUN go install github.com/mailhog/mhsendmail@latest
 
 FROM axllent/mailpit:latest AS mps-builder
@@ -9,6 +11,9 @@ FROM axllent/mailpit:latest AS mps-builder
 FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
 USER root
 ARG PHP_VERSION
+
+COPY --chmod=0755 update-ca-trust /usr/local/bin/
+RUN update-ca-trust
 
 ENV MAIL_SERVICE_PORT=1025
 
@@ -55,7 +60,6 @@ RUN apk --no-cache add \
     sudo \
     busybox-suid \
     gettext \
-    ca-certificates \
     shadow \
     git \
     rsync \
