@@ -2,8 +2,13 @@ ARG ENV_SOURCE_IMAGE
 ARG PHP_VERSION
 
 FROM public.ecr.aws/docker/library/golang:alpine AS mhs-builder
-COPY --chmod=0755 update-ca-trust /usr/local/bin/
-RUN update-ca-trust
+# Persist root distrust on Alpine branches with older CA packages.
+RUN apk add --no-cache --upgrade ca-certificates ca-certificates-bundle \
+    && sed -i \
+        -e 's|^mozilla/emSign_ECC_Root_CA_-_G3\.crt$|!mozilla/emSign_ECC_Root_CA_-_G3.crt|' \
+        -e 's|^mozilla/Comodo_AAA_Services_root\.crt$|!mozilla/Comodo_AAA_Services_root.crt|' \
+        /etc/ca-certificates.conf \
+    && update-ca-certificates
 RUN go install github.com/mailhog/mhsendmail@latest
 
 FROM axllent/mailpit:latest AS mps-builder
@@ -12,8 +17,12 @@ FROM ${ENV_SOURCE_IMAGE:-php}:${PHP_VERSION}-fpm-alpine
 USER root
 ARG PHP_VERSION
 
-COPY --chmod=0755 update-ca-trust /usr/local/bin/
-RUN update-ca-trust
+RUN apk add --no-cache --upgrade ca-certificates ca-certificates-bundle \
+    && sed -i \
+        -e 's|^mozilla/emSign_ECC_Root_CA_-_G3\.crt$|!mozilla/emSign_ECC_Root_CA_-_G3.crt|' \
+        -e 's|^mozilla/Comodo_AAA_Services_root\.crt$|!mozilla/Comodo_AAA_Services_root.crt|' \
+        /etc/ca-certificates.conf \
+    && update-ca-certificates
 
 ENV MAIL_SERVICE_PORT=1025
 
