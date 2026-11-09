@@ -1,0 +1,51 @@
+name: Docker Image RustFS
+on:
+  schedule:
+    - cron: "30 3 * * 0" # At 03:30 on Sunday
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - version
+      - images/rustfs/**
+      - .github/workflows/docker-image-rustfs.yml
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  rustfs:
+    name: RustFS
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: '1.0.4'
+            rclone-version: '1.76.0'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ !env.ACT }}
+      - uses: docker/setup-qemu-action@v4
+        with:
+          cache-image: true
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: images/rustfs
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            RUSTFS_VERSION=${{ matrix.version }}
+            RCLONE_VERSION=${{ matrix.rclone-version }}
+          push: ${{ github.ref == 'refs/heads/main' && !env.ACT }}
+          tags: ghcr.io/${{ github.repository_owner }}/rustfs:${{ matrix.version }}
