@@ -23,9 +23,57 @@ This repository contain image build configurations used in Magenius fork of [War
 | Elasticvue              | latest | [![Elasticvue build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-elasticvue.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-elasticvue.yml) |
 | Buggregator | 1.13.7, 1.16.0, 2.1.0, 2.2.0, 2.2.1, 2.3.0, 2.3.1, 2.4.0, 2.4.1, 2.7.0 | [![Buggregator build](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-buggregator.yml/badge.svg?branch=main)](https://github.com/magenius-team/warden-images/actions/workflows/docker-image-buggregator.yml) |||||||||||
 
+## Allure candidate (unbuilt and unpublished)
+
+`images/allure` defines an Allure 2.44.0 candidate for `linux/amd64` and
+`linux/arm64`. It builds the runtime from `eclipse-temurin:11-jre-noble` for
+the target platform, rather than rebasing the upstream service image whose
+2.44.0 arm64 manifest contains x86-64 executables.
+The API and scripts come from
+[fescobar/allure-docker-service](https://github.com/fescobar/allure-docker-service/tree/790d13f5e5283bcb839d68fe238546991af480db),
+pinned at `790d13f5e5283bcb839d68fe238546991af480db` through the required
+`allure-source` named build context.
+
+Local build recipe (run from this repository; choose the host's native
+platform):
+
+```sh
+docker buildx build \
+  --platform linux/arm64 \
+  --build-context allure-source=https://github.com/fescobar/allure-docker-service.git#790d13f5e5283bcb839d68fe238546991af480db \
+  --build-arg ALLURE_RELEASE=2.44.0 \
+  --build-arg BUILD_VERSION=2.44.0 \
+  --build-arg BUILD_REF=790d13f5e5283bcb839d68fe238546991af480db \
+  --tag allure:2.44.0-candidate --load images/allure
+```
+
+The workflow defines `ghcr.io/${{ github.repository_owner }}/allure:2.44.0`
+with publication restricted to `main` outside `ACT`. Its definition is not
+evidence of a successful build or publication. The initial push triggers the
+multi-platform build and publication; their results remain unverified.
+Final ELF architecture checks for Bash/Java/Python and native API/history
+acceptance have not been performed for this candidate.
+The pinned source is not a fully reproducible build: the base tag, package
+repositories, and upstream `get-pip.py` download remain mutable.
+
+The upstream runtime contract is retained: UID/GID 1000, user `allure`,
+API port 5050, and the existing healthcheck and startup scripts.
+Report history requires persistent report storage (for example,
+`/app/default-reports`, or `/app/projects` for multiple projects), not only
+`/app/allure-results`; configure upstream history retention as needed.
+
 ## License
 
 This work is licensed under the MIT license. See [LICENSE](https://github.com/magenius-team/warden-images/blob/main/LICENSE) file for details.
+
+Exception: the Allure Dockerfile is adapted from Frank Escobar's
+`allure-docker-service` runtime definition at the commit above, under
+Apache-2.0, not this repository's MIT license. Its modification notice and
+upstream author attribution are retained in `images/allure/Dockerfile`.
+The full unchanged upstream license is in [images/allure/LICENSE](images/allure/LICENSE)
+and is copied into the image at
+`/usr/share/licenses/allure-docker-service/LICENSE`. Upstream API and script
+notices are retained by copying those source directories unchanged.
 
 ## Maintainers
 

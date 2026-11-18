@@ -1,0 +1,129 @@
+# Adapted from Frank Escobar's allure-docker-service docker/Dockerfile:
+# https://github.com/fescobar/allure-docker-service/tree/790d13f5e5283bcb839d68fe238546991af480db
+# Apache-2.0; see LICENSE. Modifications: omit the development lint stage,
+# use the target-platform runtime, pinned named source context, and release 2.44.0;
+# correct license/platform metadata and include the upstream license in the image.
+ARG JDK=eclipse-temurin:11-jre-noble
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG BUILD_REF
+ARG ALLURE_RELEASE=2.44.0
+ARG ALLURE_REPO=https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline
+ARG UID=1000
+ARG GID=1000
+ARG PYTHON_VERSION=3.13
+
+FROM $JDK
+ARG JDK
+ARG TARGETPLATFORM
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG BUILD_REF
+ARG ALLURE_RELEASE
+ARG ALLURE_REPO
+ARG UID
+ARG GID
+ARG PYTHON_VERSION=3.13
+
+LABEL org.label-schema.build-date=${BUILD_DATE} \
+    org.label-schema.docker.dockerfile="images/allure/Dockerfile" \
+    org.label-schema.license="Apache-2.0" \
+    org.label-schema.name="Allure Framework" \
+    org.label-schema.version=${BUILD_VERSION} \
+    org.label-schema.description="Allure Framework is a flexible lightweight multi-language test report tool." \
+    org.label-schema.url="https://docs.qameta.io/allure/" \
+    org.label-schema.vcs-ref=${BUILD_REF} \
+    org.label-schema.vcs-type="Git" \
+    org.label-schema.vcs-url="https://github.com/fescobar/allure-docker-service" \
+    org.label-schema.arch=${TARGETPLATFORM} \
+    authors="Frank Escobar <fescobar.systems@gmail.com>"
+
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+      tzdata \
+      nano \
+      python${PYTHON_VERSION} \
+      unzip && \
+    ln -s `which python3` /usr/bin/python && \
+    apt-get purge python3-cryptography -y && \
+    apt-get autoremove -y && \
+    wget https://bootstrap.pypa.io/get-pip.py && \
+    sed -i "s/\"--force-reinstall\"/\"--force-reinstall\", \"--break-system-packages\"/g" get-pip.py && \
+    python${PYTHON_VERSION} get-pip.py && \
+    python${PYTHON_VERSION} -m pip config set global.break-system-packages true && \
+    python${PYTHON_VERSION} -m pip install setuptools==82.0.0 wheel==0.46.2 waitress==3.0.2 pipdeptree==2.29.0 cffi==2.0.0 cryptography==48.0.1 && \
+    python${PYTHON_VERSION} -m pip install --ignore-installed --upgrade Flask==3.1.2 Flask-JWT-Extended==4.7.1 flask-swagger-ui==4.11.1 requests==2.33.0 && \
+    curl ${ALLURE_REPO}/${ALLURE_RELEASE}/allure-commandline-${ALLURE_RELEASE}.zip -L -o /tmp/allure-commandline.zip && \
+        unzip -q /tmp/allure-commandline.zip -d / && \
+        apt-get remove -y unzip && \
+        rm -rf /tmp/* && \
+        rm -rf /var/lib/apt/lists/* && \
+        chmod -R +x /allure-$ALLURE_RELEASE/bin && \
+        mkdir -p /app
+
+RUN usermod -l allure $(getent passwd ${UID} | cut -d: -f1)
+RUN mkdir -p /home/allure && \
+    chown -R ${UID}:${GID} /home/allure
+
+ENV PYTHON_VERSION=${PYTHON_VERSION}
+ENV ROOT=/app
+ENV ALLURE_HOME=/allure-$ALLURE_RELEASE
+ENV ALLURE_HOME_SL=/allure
+ENV PATH=$PATH:$ALLURE_HOME/bin
+ENV ALLURE_RESOURCES=$ROOT/resources
+ENV RESULTS_DIRECTORY=$ROOT/allure-results
+ENV REPORT_DIRECTORY=$ROOT/allure-report
+ENV RESULTS_HISTORY=$RESULTS_DIRECTORY/history
+ENV REPORT_HISTORY=$REPORT_DIRECTORY/history
+ENV ALLURE_VERSION=$ROOT/version
+ENV EMAILABLE_REPORT_FILE_NAME='emailable-report-allure-docker-service.html'
+ENV STATIC_CONTENT=$ROOT/allure-docker-api/static
+ENV STATIC_CONTENT_PROJECTS=$STATIC_CONTENT/projects
+ENV DEFAULT_PROJECT=default
+ENV DEFAULT_PROJECT_ROOT=$STATIC_CONTENT_PROJECTS/$DEFAULT_PROJECT
+ENV DEFAULT_PROJECT_RESULTS=$DEFAULT_PROJECT_ROOT/results
+ENV DEFAULT_PROJECT_REPORTS=$DEFAULT_PROJECT_ROOT/reports
+ENV EXECUTOR_FILENAME=executor.json
+
+RUN echo -n $(allure --version) > ${ALLURE_VERSION} && \
+    echo "ALLURE_VERSION: "$(cat ${ALLURE_VERSION}) && \
+    mkdir $ALLURE_HOME_SL && \
+    ln -s $ALLURE_HOME/* $ALLURE_HOME_SL && \
+    ln -s $STATIC_CONTENT_PROJECTS $ROOT/projects && \
+    ln -s $DEFAULT_PROJECT_REPORTS $ROOT/default-reports
+
+WORKDIR $ROOT
+COPY --from=allure-source --chown=${UID}:${GID} /allure-docker-api /app/allure-docker-api
+COPY --from=allure-source --chown=${UID}:${GID} /allure-docker-scripts /app/
+COPY --from=allure-source /LICENSE /usr/share/licenses/allure-docker-service/LICENSE
+RUN chmod +x $ROOT/*.sh && \
+    mkdir $RESULTS_DIRECTORY && \
+    mkdir -p $DEFAULT_PROJECT_REPORTS/latest && \
+    ln -sf $RESULTS_DIRECTORY $DEFAULT_PROJECT_RESULTS && \
+    ln -sf $DEFAULT_PROJECT_REPORTS/latest $REPORT_DIRECTORY && \
+    allure generate -c -o /tmp/resources && \
+    mkdir -p $ALLURE_RESOURCES && \
+    APP_FILE=$(find /tmp/resources -type f \( -name "app.js" -o -name "index.js" -o -name "*.js" \) | head -n 1) && \
+    CSS_FILE=$(find /tmp/resources -type f \( -name "styles.css" -o -name "index.css" -o -name "*.css" \) | head -n 1) && \
+    if [ -n "$APP_FILE" ]; then cp "$APP_FILE" $ALLURE_RESOURCES/app.js; else touch $ALLURE_RESOURCES/app.js; fi && \
+    if [ -n "$CSS_FILE" ]; then cp "$CSS_FILE" $ALLURE_RESOURCES/styles.css; else touch $ALLURE_RESOURCES/styles.css; fi
+
+RUN chown -R ${UID}:${GID} $ROOT
+
+VOLUME [ "$RESULTS_DIRECTORY" ]
+
+ENV DEPRECATED_PORT=4040
+ENV PORT=5050
+
+EXPOSE $DEPRECATED_PORT
+EXPOSE $PORT
+
+HEALTHCHECK --interval=10s --timeout=60s --retries=3 \
+      CMD curl -f http://localhost:$PORT || exit 1
+
+USER allure
+
+CMD $ROOT/runAllureDeprecated.sh & $ROOT/runAllureApp.sh & $ROOT/checkAllureResultsFiles.sh
